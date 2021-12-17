@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+
+    <!-- CookiePro Cookies Consent Notice start for www.svenskfast.se -->
+    <script type="text/javascript"
+            src="https://cookie-cdn.cookiepro.com/consent/f9d0c5d6-4ad8-4515-a42e-eb9b1b48505d/OtAutoBlock.js"></script>
+    <script src="https://cookie-cdn.cookiepro.com/scripttemplates/otSDKStub.js" type="text/javascript" charset="UTF-8"
+            data-domain-script="f9d0c5d6-4ad8-4515-a42e-eb9b1b48505d"></script>
+    <script type="text/javascript">
+      function OptanonWrapper() {
+        // Get initial OnetrustActiveGroups ids
+        if (typeof OptanonWrapperCount == "undefined") {
+          otGetInitialGrps();
+        }
+
+        //Delete cookies
+        otDeleteCookie(otIniGrps);
+
+        // Assign OnetrustActiveGroups to custom variable
+        function otGetInitialGrps() {
+          OptanonWrapperCount = '';
+          otIniGrps = OnetrustActiveGroups;
+          // console.log("otGetInitialGrps", otIniGrps)
+        }
+
+        function otDeleteCookie(iniOptGrpId) {
+          var otDomainGrps = JSON.parse(JSON.stringify(Optanon.GetDomainData().Groups));
+          var otDeletedGrpIds = otGetInactiveId(iniOptGrpId, OnetrustActiveGroups);
+          if (otDeletedGrpIds.length != 0 && otDomainGrps.length != 0) {
+            for (var i = 0; i < otDomainGrps.length; i++) {
+              //Check if CustomGroupId matches
+              if (otDomainGrps[i]['CustomGroupId'] != '' && otDeletedGrpIds.includes(otDomainGrps[i]['CustomGroupId'])) {
+                for (var j = 0; j < otDomainGrps[i]['Cookies'].length; j++) {
+                  // console.log("otDeleteCookie",otDomainGrps[i]['Cookies'][j]['Name'])
+                  //Delete cookie
+                  eraseCookie(otDomainGrps[i]['Cookies'][j]['Name']);
+                }
+              }
+
+              //Check if Hostid matches
+              if (otDomainGrps[i]['Hosts'].length != 0) {
+                for (var j = 0; j < otDomainGrps[i]['Hosts'].length; j++) {
+                  //Check if HostId presents in the deleted list and cookie array is not blank
+                  if (otDeletedGrpIds.includes(otDomainGrps[i]['Hosts'][j]['HostId']) && otDomainGrps[i]['Hosts'][j]['Cookies'].length != 0) {
+                    for (var k = 0; k < otDomainGrps[i]['Hosts'][j]['Cookies'].length; k++) {
+                      //Delete cookie
+                      eraseCookie(otDomainGrps[i]['Hosts'][j]['Cookies'][k]['Name']);
+                    }
+                  }
+                }
+              }
+
+            }
+          }
+          otGetInitialGrps(); //Reassign new group ids
+        }
+
+        //Get inactive ids
+        function otGetInactiveId(customIniId, otActiveGrp) {
+          //Initial OnetrustActiveGroups
+          // console.log("otGetInactiveId",customIniId)
+          customIniId = customIniId.split(",");
+          customIniId = customIniId.filter(Boolean);
+
+          //After action OnetrustActiveGroups
+          otActiveGrp = otActiveGrp.split(",");
+          otActiveGrp = otActiveGrp.filter(Boolean);
+
+          var result = [];
+          for (var i = 0; i < customIniId.length; i++) {
+            if (otActiveGrp.indexOf(customIniId[i]) <= -1) {
+              result.push(customIniId[i]);
+            }
+          }
+          return result;
+        }
+
+        //Delete cookie
+        function eraseCookie(name) {
+          //Delete root path cookies
+          domainName = window.location.hostname;
+          document.cookie = name + '=; Max-Age=-99999999; Path=/;Domain=' + domainName;
+          document.cookie = name + '=; Max-Age=-99999999; Path=/;';
+
+          //Delete LSO incase LSO being used, cna be commented out.
+          localStorage.removeItem(name);
+
+          //Check for the current path of the page
+          pathArray = window.location.pathname.split('/');
+          //Loop through path hierarchy and delete potential cookies at each path.
+          for (var i = 0; i < pathArray.length; i++) {
+            if (pathArray[i]) {
+              //Build the path string from the Path Array e.g /site/login
+              var currentPath = pathArray.slice(0, i + 1).join('/');
+              document.cookie = name + '=; Max-Age=-99999999; Path=' + currentPath + ';Domain=' + domainName;
+              document.cookie = name + '=; Max-Age=-99999999; Path=' + currentPath + ';';
+              //Maybe path has a trailing slash!
+              document.cookie = name + '=; Max-Age=-99999999; Path=' + currentPath + '/;Domain=' + domainName;
+              document.cookie = name + '=; Max-Age=-99999999; Path=' + currentPath + '/;';
+
+
+            }
+          }
+
+        }
+
+        //Call server, set (or remove) sf_source cookie if not already set/removed
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("POST", "/api/cookie/setsourcecookie", true);
+        xhttp.send();
+      }
+    </script>
+    <!-- CookiePro Cookies Consent Notice end for www.svenskfast.se -->
+
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+    <link rel="shortcut icon" href="https://su.sfcdn.se/images/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" sizes="192x192" href="https://su.sfcdn.se/images/touch-icon.png">
+    <link rel="apple-touch-icon" href="https://su.sfcdn.se/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="https://su.sfcdn.se/images/apple-touch-icon.png">
+
+
+    <title>Hus &amp; villor till salu - Kalmar | Svensk Fastighetsf&#246;rmedling</title>
+
+
+    <meta name="description"
+          content="H&#228;r hittar du hus &amp; villor till salu i Kalmar, Kalmar kommun hos Svensk Fastighetsf&#246;rmedling. Med v&#229;ra smarta filter hittar du snabbt hus &amp; villor som passar dig.">
+
+
+    <link rel="canonical" href="https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/"/>
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@svenskfast">
+    <meta name="twitter:creator" content="@svenskfast">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Svensk Fastighetsförmedling">
+    <meta property="og:title" content="Hus &amp; villor till salu - Kalmar | Svensk Fastighetsf&#246;rmedling">
+    <meta property="og:locale" content="sv_SE"/>
+    <meta property="og:description"
+          content="H&#228;r hittar du hus &amp; villor till salu i Kalmar, Kalmar kommun hos Svensk Fastighetsf&#246;rmedling. Med v&#229;ra smarta filter hittar du snabbt hus &amp; villor som passar dig.">
+
+    <meta property="og:url" content="https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/">
+
+
+    <meta property="fb:app_id" content="1223618324373372"/>
+
+
+    <link rel="preconnect" href="https://su.sfcdn.se" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://su.sfcdn.se">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <link rel="dns-prefetch" href="https://www.googleadservices.com">
+    <link rel="dns-prefetch" href="https://connect.facebook.net">
+
+    <script>
+      /*! modernizr 3.6.0 (Custom Build) | MIT *
+      * https://modernizr.com/download/?-input-touchevents-video-webp-mq-setclasses !*/
+      !function (e, n, t) {
+        function o(e, n) {
+          return typeof e === n
+        }
+
+        function a() {
+          var e, n, t, a, i, r, s;
+          for (var A in u) if (u.hasOwnProperty(A)) {
+            if (e = [], n = u[A], n.name && (e.push(n.name.toLowerCase()), n.options && n.options.aliases && n.options.aliases.length)) for (t = 0; t < n.options.aliases.length; t++) e.push(n.options.aliases[t].toLowerCase());
+            for (a = o(n.fn, "function") ? n.fn() : n.fn, i = 0; i < e.length; i++) r = e[i], s = r.split("."), 1 === s.length ? Modernizr[s[0]] = a : (!Modernizr[s[0]] || Modernizr[s[0]] instanceof Boolean || (Modernizr[s[0]] = new Boolean(Modernizr[s[0]])), Modernizr[s[0]][s[1]] = a), c.push((a ? "" : "no-") + s.join("-"))
+          }
+        }
+
+        function i(e) {
+          var n = p.className, t = Modernizr._config.classPrefix || "";
+          if (d && (n = n.baseVal), Modernizr._config.enableJSClass) {
+            var o = new RegExp("(^|\\s)" + t + "no-js(\\s|$)");
+            n = n.replace(o, "$1" + t + "js$2")
+          }
+          Modernizr._config.enableClasses && (n += " " + t + e.join(" " + t), d ? p.className.baseVal = n : p.className = n)
+        }
+
+        function r() {
+          return "function" != typeof n.createElement ? n.createElement(arguments[0]) : d ? n.createElementNS.call(n, "http://www.w3.org/2000/svg", arguments[0]) : n.createElement.apply(n, arguments)
+        }
+
+        function s() {
+          var e = n.body;
+          return e || (e = r(d ? "svg" : "body"), e.fake = !0), e
+        }
+
+        function A(e, t, o, a) {
+          var i, A, l, c, u = "modernizr", f = r("div"), d = s();
+          if (parseInt(o, 10)) for (; o--;) l = r("div"), l.id = a ? a[o] : u + (o + 1), f.appendChild(l);
+          return i = r("style"), i.type = "text/css", i.id = "s" + u, (d.fake ? d : f).appendChild(i), d.appendChild(f), i.styleSheet ? i.styleSheet.cssText = e : i.appendChild(n.createTextNode(e)), f.id = u, d.fake && (d.style.background = "", d.style.overflow = "hidden", c = p.style.overflow, p.style.overflow = "hidden", p.appendChild(d)), A = t(f, e), d.fake ? (d.parentNode.removeChild(d), p.style.overflow = c, p.offsetHeight) : f.parentNode.removeChild(f), !!A
+        }
+
+        function l(e, n) {
+          if ("object" == typeof e) for (var t in e) b(e, t) && l(t, e[t]); else {
+            e = e.toLowerCase();
+            var o = e.split("."), a = Modernizr[o[0]];
+            if (2 == o.length && (a = a[o[1]]), "undefined" != typeof a) return Modernizr;
+            n = "function" == typeof n ? n() : n, 1 == o.length ? Modernizr[o[0]] = n : (!Modernizr[o[0]] || Modernizr[o[0]] instanceof Boolean || (Modernizr[o[0]] = new Boolean(Modernizr[o[0]])), Modernizr[o[0]][o[1]] = n), i([(n && 0 != n ? "" : "no-") + o.join("-")]), Modernizr._trigger(e, n)
+          }
+          return Modernizr
+        }
+
+        var c = [], u = [], f = {
+          _version: "3.6.0",
+          _config: {classPrefix: "", enableClasses: !0, enableJSClass: !0, usePrefixes: !0},
+          _q: [],
+          on: function (e, n) {
+            var t = this;
+            setTimeout(function () {
+              n(t[e])
+            }, 0)
+          },
+          addTest: function (e, n, t) {
+            u.push({name: e, fn: n, options: t})
+          },
+          addAsyncTest: function (e) {
+            u.push({name: null, fn: e})
+          }
+        }, Modernizr = function () {
+        };
+        Modernizr.prototype = f, Modernizr = new Modernizr;
+        var p = n.documentElement, d = "svg" === p.nodeName.toLowerCase();
+        Modernizr.addTest("video", function () {
+          var e = r("video"), n = !1;
+          try {
+            n = !!e.canPlayType, n && (n = new Boolean(n), n.ogg = e.canPlayType('video/ogg; codecs="theora"').replace(/^no$/, ""), n.h264 = e.canPlayType('video/mp4; codecs="avc1.42E01E"').replace(/^no$/, ""), n.webm = e.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/^no$/, ""), n.vp9 = e.canPlayType('video/webm; codecs="vp9"').replace(/^no$/, ""), n.hls = e.canPlayType('application/x-mpegURL; codecs="avc1.42E01E"').replace(/^no$/, ""))
+          } catch (t) {
+          }
+          return n
+        });
+        var m = r("input"),
+          h = "autocomplete autofocus list placeholder max min multiple pattern required step".split(" "), v = {};
+        Modernizr.input = function (n) {
+          for (var t = 0, o = n.length; o > t; t++) v[n[t]] = !!(n[t] in m);
+          return v.list && (v.list = !(!r("datalist") || !e.HTMLDataListElement)), v
+        }(h);
+        var g = f._config.usePrefixes ? " -webkit- -moz- -o- -ms- ".split(" ") : ["", ""];
+        f._prefixes = g;
+        var y = function () {
+          var n = e.matchMedia || e.msMatchMedia;
+          return n ? function (e) {
+            var t = n(e);
+            return t && t.matches || !1
+          } : function (n) {
+            var t = !1;
+            return A("@media " + n + " { #modernizr { position: absolute; } }", function (n) {
+              t = "absolute" == (e.getComputedStyle ? e.getComputedStyle(n, null) : n.currentStyle).position
+            }), t
+          }
+        }();
+        f.mq = y;
+        var w = f.testStyles = A;
+        Modernizr.addTest("touchevents", function () {
+          var t;
+          if ("ontouchstart" in e || e.DocumentTouch && n instanceof DocumentTouch) t = !0; else {
+            var o = ["@media (", g.join("touch-enabled),("), "heartz", ")", "{#modernizr{top:9px;position:absolute}}"].join("");
+            w(o, function (e) {
+              t = 9 === e.offsetTop
+            })
+          }
+          return t
+        });
+        var b;
+        !function () {
+          var e = {}.hasOwnProperty;
+          b = o(e, "undefined") || o(e.call, "undefined") ? function (e, n) {
+            return n in e && o(e.constructor.prototype[n], "undefined")
+          } : function (n, t) {
+            return e.call(n, t)
+          }
+        }(), f._l = {}, f.on = function (e, n) {
+          this._l[e] || (this._l[e] = []), this._l[e].push(n), Modernizr.hasOwnProperty(e) && setTimeout(function () {
+            Modernizr._trigger(e, Modernizr[e])
+          }, 0)
+        }, f._trigger = function (e, n) {
+          if (this._l[e]) {
+            var t = this._l[e];
+            setTimeout(function () {
+              var e, o;
+              for (e = 0; e < t.length; e++) (o = t[e])(n)
+            }, 0), delete this._l[e]
+          }
+        }, Modernizr._q.push(function () {
+          f.addTest = l
+        }), Modernizr.addAsyncTest(function () {
+          function e(e, n, t) {
+            function o(n) {
+              var o = n && "load" === n.type ? 1 == a.width : !1, i = "webp" === e;
+              l(e, i && o ? new Boolean(o) : o), t && t(n)
+            }
+
+            var a = new Image;
+            a.onerror = o, a.onload = o, a.src = n
+          }
+
+          var n = [{
+            uri: "data:image/webp;base64,UklGRiQAAABXRUJQVlA4IBgAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=",
+            name: "webp"
+          }, {
+            uri: "data:image/webp;base64,UklGRkoAAABXRUJQVlA4WAoAAAAQAAAAAAAAAAAAQUxQSAwAAAABBxAR/Q9ERP8DAABWUDggGAAAADABAJ0BKgEAAQADADQlpAADcAD++/1QAA==",
+            name: "webp.alpha"
+          }, {
+            uri: "data:image/webp;base64,UklGRlIAAABXRUJQVlA4WAoAAAASAAAAAAAAAAAAQU5JTQYAAAD/////AABBTk1GJgAAAAAAAAAAAAAAAAAAAGQAAABWUDhMDQAAAC8AAAAQBxAREYiI/gcA",
+            name: "webp.animation"
+          }, {
+            uri: "data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=",
+            name: "webp.lossless"
+          }], t = n.shift();
+          e(t.name, t.uri, function (t) {
+            if (t && "load" === t.type) for (var o = 0; o < n.length; o++) e(n[o].name, n[o].uri)
+          })
+        }), a(), i(c), delete f.addTest, delete f.addAsyncTest;
+        for (var T = 0; T < Modernizr._q.length; T++) Modernizr._q[T]();
+        e.Modernizr = Modernizr
+      }(window, document);
+    </script>
+
+
+    <link href="https://su.sfcdn.se/ui/stylesheets/screen.min.md5.627968cabd4df335765b7a600fab30df.css" rel="stylesheet"
+          type="text/css">
+
+
+    <!-- To remove console errors on pages with epiforms epi is not defined
+    at initializeOnRenderingFormDescriptor (GetFormInitScript?formGuid=fff70362-3b89-4905-b75e-ff001f22c722&formLanguage=sv:7)-->
+
+
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        pageInfo: {
+          market: 'Sweden',
+          contentType: 'object-search',
+          office: '',
+          officeId: '',
+          environment: 'prod'
+        }
+      });
+    </script>
+
+
+    <!-- Anti-flicker snippet -->
+    <!-- End anti-flicker snippet -->
+    <!-- Google Tag Manager -->
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({
+          'gtm.start':
+            new Date().getTime(),
+          event: 'gtm.js'
+        });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src =
+          '//www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-W6ZZXX');
+    </script>
+    <!-- End Google Tag Manager -->
+
+</head>
+
+
+<body id="object-search-page" data-gtmcontentcat="object-search">
+<!--[if lt IE 9]>
+<p class="chromeframe">Du använder en <strong>föråldrad</strong> webbläsare. Vänligen <a href="http://browsehappy.com/">uppgradera
+    din webbläsare</a> för att förbättra din upplevelse.</p>
+<![endif]-->
+
+
+<!-- Google Tag Manager -->
+<noscript>
+    <iframe src="//www.googletagmanager.com/ns.html?id=GTM-W6ZZXX"
+            height="0" width="0" style="display: none; visibility: hidden"></iframe>
+</noscript>
+<!-- End Google Tag Manager -->
+
+
+<a href="#content" id="top" class="accessibility">Hoppa till innehåll</a>
+
+
+<div class="site-header__country-wrapper--mobile visuallyhidden--lap visuallyhidden--desk">
+    <a href="/" class="site-header__country-btn--mobile" id="countrySelectBtnMobile"><i
+            class="icon__flag icon__flag--sweden"></i>Sverige<i class="icon icon_arrow-down float--right"></i></a>
+    <div class="country__dropdown" id="countrySelectDropMobile">
+        <div class="country__dropdown--content">
+            <a href="/" class="active"><i class="icon__flag icon__flag--sweden"></i>Sverige</a>
+            <a href="/spanien/" class="" id="countrySelectLinkSpainMobile"><i class="icon__flag icon__flag--spain"></i>Spanien</a>
+        </div>
+    </div>
+</div>
+<script>
+  if ("ontouchstart" in document.documentElement) {
+    var button = document.getElementById("countrySelectBtnMobile");
+
+    button.addEventListener("click",
+      function (e) {
+        e.preventDefault();
+        document.getElementById("countrySelectDropMobile").classList.toggle("open");
+      },
+      false);
+
+    window.addEventListener("click",
+      function (e) {
+        if (!e.target.matches('#countrySelectBtnMobile')) {
+          var dropdown = document.getElementById("countrySelectDropMobile");
+          if (dropdown.classList.contains('open')) {
+            dropdown.classList.remove('open');
+          }
+        }
+      },
+      false);
+  }
+</script>
+
+<header class="site-header" role="banner" id="siteHeader">
+    <div class="grid-wrapper">
+        <div class="grid site-header__wrapper">
+            <div class="float--left push--right soft--left">
+                <a href="/" class="site-logo GTMMainNavLink" data-parent="none" rel="home">Svensk
+                    Fastighetsförmedling</a>
+            </div>
+
+            <div class="grid__item one-whole desk-eight-twelfths">
+                <nav>
+                    <ul class="nav site-header__primary-nav" id="siteHeaderPrimaryNav">
+                        <li class="nav__item  ">
+                            <a href="/salja-bostad/" class="nav__item--search-link nav__item--has-mega GTMMainNavLink"
+                               data-parent="none">S&#228;lja</a>
+                        </li>
+                        <li class="nav__item  ">
+                            <a href="/kopa-bostad/" class="nav__item--search-link nav__item--has-mega GTMMainNavLink"
+                               data-parent="none">K&#246;pa</a>
+                        </li>
+                        <li class="nav__item ">
+                            <a href="/hitta-maklare/" class="nav__item--search-link GTMMainNavLink" data-parent="none">
+                                <span>Hitta m&#228;klare</span>
+                            </a>
+                        </li>
+                        <li class="nav__item nav__item--active">
+                            <a href="/bostad/" class="nav__item--search-link GTMMainNavLink" data-parent="none">
+                                <i class="nav__icon--magnify"></i> <span>Till salu</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="site-header__button--wrapper">
+                <a href="/vardera-bostad/"
+                   class="btn btn--primary btn--rounded btn--small btn__shadow--none btn--inline btn--gamma site-header__valuation--btn GTMMainNavLink"
+                   title="V&#228;rdera bostad" data-parent="none">
+                    <span class="visuallyhidden--lap visuallyhidden--desk">V&#228;rdera</span>
+                    <span class="visuallyhidden--palm">Boka v&#228;rdering</span>
+                </a>
+
+
+                <a href="/mina-sidor" class="btn btn--rounded btn--small btn__shadow--none btn--my-pages "
+                   rel="nofollow">Mina sidor</a>
+
+                <div class="site-header__country-wrapper visuallyhidden--palm">
+                    <a href="/" class="btn btn--rounded btn--small btn__shadow--none site-header__country-btn"
+                       id="countrySelectBtn"><i class="icon__flag icon__flag--sweden"></i>Sverige<i
+                            class="icon icon_arrow-down"></i></a>
+                    <div class="country__dropdown" id="countrySelectDrop">
+                        <div class="country__dropdown--content">
+                            <a href="/" class="active"><i class="icon__flag icon__flag--sweden"></i>Sverige</a>
+                            <a href="/spanien/" class="" id="countrySelectLinkSpain"><i
+                                    class="icon__flag icon__flag--spain"></i>Spanien</a>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                  if ("ontouchstart" in document.documentElement) {
+                    var button = document.getElementById("countrySelectBtn");
+
+                    button.addEventListener("click",
+                      function (e) {
+                        e.preventDefault();
+                        document.getElementById("countrySelectDrop").classList.toggle("open");
+                      },
+                      false);
+
+                    window.addEventListener("click",
+                      function (e) {
+                        if (!e.target.matches('#countrySelectBtn')) {
+                          var dropdown = document.getElementById("countrySelectDrop");
+                          if (dropdown.classList.contains('open')) {
+                            dropdown.classList.remove('open');
+                          }
+                        }
+                      },
+                      false);
+                  }
+                </script>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="site-header__mega--wrapper" id="megaMenuContainer">
+</div>
+
+
+<div id="content" class="page object-search-page">
+
+
+    <section class="object-search-wrapper">
+        <div class="grid-wrapper">
+            <div class="grid">
+                <div class="grid__item search-input">
+
+                    <div class="push--bottom">
+                        <a href="/bostad/" class="btn btn--tab fetch__btn active" title="Bostäder till salu i Sverige">Sverige</a>
+                        <a href="/spanien/bostad/" class="btn btn--tab fetch__btn "
+                           title="Bostäder till salu i Spanien">Spanien</a>
+                    </div>
+                    <form id="object-search-form">
+                        <div class="search-input__wrapper">
+                            <span class="search-input__search hide" id="js-search-input__search"><i
+                                    class="search__icon icon--magnify"></i></span>
+                            <a href="#" class="search-input__clear hide" id="js-search-input__clear"><i
+                                    class="search__icon icon--clear"></i></a>
+                            <input type="hidden" id="sf-search-url" value="/Sweden/search/object"/>
+                            <input type="hidden" id="sf-search-suggest-url" value="/suggestions?market=Sweden"/>
+                            <input type="hidden" id="sf-search-values"
+                                   value="[{&quot;id&quot;:&quot;l:kalmar/kalmar/kalmar&quot;,&quot;text&quot;:&quot;Kalmar (Ort)&quot;},{&quot;id&quot;:&quot;l:kalmar/morbylanga/farjestaden&quot;,&quot;text&quot;:&quot;F&#228;rjestaden (Ort)&quot;},{&quot;id&quot;:&quot;t:Villa&quot;,&quot;text&quot;:&quot;Villa&quot;},{&quot;id&quot;:&quot;t:Radhus&quot;,&quot;text&quot;:&quot;Radhus&quot;},{&quot;id&quot;:&quot;t:Fritidshus&quot;,&quot;text&quot;:&quot;Fritidshus&quot;},{&quot;id&quot;:&quot;t:Nyproduktionsprojekt&quot;,&quot;text&quot;:&quot;Nyproduktionsprojekt&quot;},{&quot;id&quot;:&quot;t:Lantbruk&quot;,&quot;text&quot;:&quot;Lantbruk&quot;},{&quot;id&quot;:&quot;t:Tomt&quot;,&quot;text&quot;:&quot;Tomt&quot;}]"/>
+                            <input type="hidden" id="sf-search-dosearch" value=""/>
+                            <input type="hidden" id="sf-search"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="grid__item one-whole search__object-type--wrapper" id="objectTypeSelector">
+
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Villa" class="search__object-type--btn icon__villa" id="typVilla"
+                           data-valueid="t:Villa" data-valuetext="Villa" title="Villa">
+                            <span class="checkmark"></span>
+                            <div class="label">Villa</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#L&#228;genhet" class="search__object-type--btn icon__lagenhet" id="typL&#228;genhet"
+                           data-valueid="t:L&#228;genhet" data-valuetext="L&#228;genhet" title="L&#228;genhet">
+                            <span class="checkmark"></span>
+                            <div class="label">L&#228;genhet</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Radhus" class="search__object-type--btn icon__radhus" id="typRadhus"
+                           data-valueid="t:Radhus" data-valuetext="Radhus" title="Radhus">
+                            <span class="checkmark"></span>
+                            <div class="label">Radhus</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Fritidshus" class="search__object-type--btn icon__fritidshus" id="typFritidshus"
+                           data-valueid="t:Fritidshus" data-valuetext="Fritidshus" title="Fritidshus">
+                            <span class="checkmark"></span>
+                            <div class="label">Fritidshus</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Nyproduktionsprojekt" class="search__object-type--btn icon__nyproduktion"
+                           id="typNyproduktionsprojekt" data-valueid="t:Nyproduktionsprojekt"
+                           data-valuetext="Nyproduktionsprojekt" title="Nyproduktionsprojekt">
+                            <span class="checkmark"></span>
+                            <div class="label">Projekt</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Lantbruk" class="search__object-type--btn icon__lantbruk" id="typLantbruk"
+                           data-valueid="t:Lantbruk" data-valuetext="Lantbruk" title="Lantbruk">
+                            <span class="checkmark"></span>
+                            <div class="label">Lantbruk</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Tomt" class="search__object-type--btn icon__tomt" id="typTomt" data-valueid="t:Tomt"
+                           data-valuetext="Tomt" title="Tomt">
+                            <span class="checkmark"></span>
+                            <div class="label">Tomt</div>
+                        </a>
+                    </div>
+                    <div class="grid__item one-quarter lap-one-eighth desk-one-eighth search__object-type--grid-item">
+                        <a href="#Kommersiellt" class="search__object-type--btn icon__kommersiellt" id="typKommersiellt"
+                           data-valueid="t:Kommersiellt" data-valuetext="Kommersiellt" title="Kommersiellt">
+                            <span class="checkmark"></span>
+                            <div class="label">Kommersiellt</div>
+                        </a>
+                    </div>
+                </div>
+                <div class="grid__item one-whole soft--bottom hide search__object-type--wrapper"
+                     id="searchDisclamerBlock">
+                    <div class="search__filter--disclamer">
+                        <i class="icon icon_info-bubble"></i>
+                        Andra filter än geografisk plats är inte applicerbara på nyproduktionsprojekt.
+                    </div>
+                </div>
+
+                <div class="grid__item soft-half--bottom one-whole search__object-type--wrapper search__sliders--wrapper">
+                    <div class="grid">
+
+
+                        <div class="grid__item one-whole lap-one-half desk-one-third">
+                            <div class="search-input__label">PRIS (KR)</div>
+                            <div class="search__slider--wrapper">
+                                <div class="search__slider--range">
+                                    <span id="priceSliderFrom" class="search__slider--from"></span>&nbsp;-&nbsp;<span
+                                        id="priceSliderTo" class="float--right search__slider--to"></span>
+                                </div>
+                                <div id="priceSlider" data-currency="SEK"></div>
+                                <input type="hidden" id="minPrice" data-cat="price"/>
+                                <input type="hidden" id="maxPrice" data-cat="price"/>
+                            </div>
+                        </div>
+                        <div class="grid__item one-whole lap-one-half desk-one-third">
+                            <div class="search-input__label">ANTAL RUM</div>
+                            <div class="search__slider--wrapper">
+                                <div class="search__slider--range">
+                                    <span id="roomSliderFrom" class="search__slider--from"></span>&nbsp;-&nbsp;<span
+                                        id="roomSliderTo" class="float--right search__slider--to"></span>
+                                </div>
+                                <div id="roomSlider"></div>
+                                <input type="hidden" id="minRooms" data-cat="rooms"/>
+                                <input type="hidden" id="maxRooms" data-cat="rooms"/>
+                            </div>
+                        </div>
+                        <div class="grid__item one-whole lap-one-half desk-one-third">
+                            <div class="search-input__label">BOAREA (KVM)</div>
+                            <div class="search__slider--wrapper">
+                                <div class="search__slider--range">
+                                    <span id="sqrSliderFrom" class="search__slider--from"></span>&nbsp;-&nbsp;<span
+                                        id="sqrSliderTo" class="float--right search__slider--to"></span>
+                                </div>
+                                <div id="sqrSlider"></div>
+                                <input type="hidden" id="minSqr" data-cat="la"/>
+                                <input type="hidden" id="maxSqr" data-cat="la"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid__item soft--bottom one-whole search__object-type--wrapper">
+                    <label class="sf-checkbox__container small push-half--top">
+
+                        Dölj bostäder utan pris
+                        <input type="checkbox" class="search-input__key-word" id="hideWithoutPrice">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+
+                <div class="search__filter--wrapper">
+                    <div class="grid__item search__shadow">
+                        <div class="filter-sort__trigger"><i class="arrow__icon arrow--down"></i><span id="filterText"
+                                                                                                       class="filter__trigger--text">Nyckelord</span>
+                        </div>
+                        <div id="js-filter-sort" class="filter-sort hide">
+                            <div class="grid">
+                                <div class="grid__item one-whole odd" id="popularKeyWordsContainer">
+                                    <div class="search-input__label">POPULÄRA NYCKELORD</div>
+                                    <label class="sf-checkbox__container small">
+                                        Balkong/Altan/Uteplats
+                                        <input type="checkbox" class="search-input__key-word"
+                                               id="sw_balkong_altan_uteplats" data-valueid="sw:Balkong/altan/uteplats"
+                                               data-valuetext="Balkong/Altan/Uteplats">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Garage/Dubbelgarage/Parkeringsplats
+                                        <input type="checkbox" class="search-input__key-word"
+                                               id="sw_garage_dubbelgarage_parkeringsplats"
+                                               data-valueid="sw:Garage/dubbelgarage/parkeringsplats"
+                                               data-valuetext="Garage/Dubbelgarage/Parkeringsplats">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Centralt
+                                        <input type="checkbox" class="search-input__key-word" id="sw_centralt"
+                                               data-valueid="sw:Centralt" data-valuetext="Centralt">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Toppskick
+                                        <input type="checkbox" class="search-input__key-word" id="sw_toppskick"
+                                               data-valueid="sw:Toppskick" data-valuetext="Toppskick">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Sj&#246;-/Havsn&#228;ra
+                                        <input type="checkbox" class="search-input__key-word" id="sw_sjo-_havsnara"
+                                               data-valueid="sw:Sj&#246;-/havsn&#228;ra"
+                                               data-valuetext="Sj&#246;-/Havsn&#228;ra">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        N&#228;ra Allm&#228;nna Kommunikationer
+                                        <input type="checkbox" class="search-input__key-word"
+                                               id="sw_naraallmannakommunikationer"
+                                               data-valueid="sw:N&#228;ra allm&#228;nna kommunikationer"
+                                               data-valuetext="N&#228;ra Allm&#228;nna Kommunikationer">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Enplanshus
+                                        <input type="checkbox" class="search-input__key-word" id="sw_enplanshus"
+                                               data-valueid="sw:Enplanshus" data-valuetext="Enplanshus">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Lantligt/Landet
+                                        <input type="checkbox" class="search-input__key-word" id="sw_lantligt_landet"
+                                               data-valueid="sw:Lantligt/landet" data-valuetext="Lantligt/Landet">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        N&#228;ra Skog/Natur
+                                        <input type="checkbox" class="search-input__key-word" id="sw_naraskog_natur"
+                                               data-valueid="sw:N&#228;ra skog/natur"
+                                               data-valuetext="N&#228;ra Skog/Natur">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Hiss
+                                        <input type="checkbox" class="search-input__key-word" id="sw_hiss"
+                                               data-valueid="sw:Hiss" data-valuetext="Hiss">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Fritt L&#228;ge/Lugnt L&#228;ge/Enskilt/Avskilt
+                                        <input type="checkbox" class="search-input__key-word"
+                                               id="sw_frittlage_lugntlage_enskilt_avskilt"
+                                               data-valueid="sw:Fritt l&#228;ge/lugnt l&#228;ge/enskilt/avskilt"
+                                               data-valuetext="Fritt L&#228;ge/Lugnt L&#228;ge/Enskilt/Avskilt">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        Frik&#246;pt Tomt
+                                        <input type="checkbox" class="search-input__key-word" id="sw_frikopttomt"
+                                               data-valueid="sw:Frik&#246;pt tomt" data-valuetext="Frik&#246;pt Tomt">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        &#196;ldre Stil
+                                        <input type="checkbox" class="search-input__key-word" id="sw_aldrestil"
+                                               data-valueid="sw:&#196;ldre stil" data-valuetext="&#196;ldre Stil">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                    <label class="sf-checkbox__container small">
+                                        &#214;ppen Spis/Kakelugn
+                                        <input type="checkbox" class="search-input__key-word" id="sw_oppenspis_kakelugn"
+                                               data-valueid="sw:&#214;ppen spis/kakelugn"
+                                               data-valuetext="&#214;ppen Spis/Kakelugn">
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid__item one-whole filter-sort-parent" id="objectSearchResultOuter">
+
+
+                        <div id="search-legend">
+
+                            <div class="grid">
+                                <div class="grid__item one-whole">
+                                    <h1 class="h__reset"><span id="searchLegendHeading"
+                                                               class="search-legend__text"> </span></h1>
+                                </div>
+                                <div class="grid__item one-whole visuallyhidden--lap visuallyhidden--desk push--bottom">
+                                    <a href="#"
+                                       class="btn btn--secondary btn--rounded btn--small btn--inline btn--less-padding"
+                                       id="showOnMapBtnMobile" rel="nofollow">Visa karta</a>
+                                    <a href="/bevakning/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=Sverige,Kalmar,Kalmar,Kalmar;Sverige,Kalmar,M&#246;rbyl&#229;nga,F&#228;rjestaden"
+                                       class="btn btn--primary btn--rounded btn--small btn--inline btn--less-padding float--right"
+                                       id="topSubscriptionLinkMobile">BEVAKA S&#214;KNING</a>
+                                </div>
+                                <div class="grid__item one-whole lap-one-third desk-one-quarter search-legend__sort--wrapper">
+
+
+                                    <select class="hide" id="SortTerm" name="SortTerm">
+                                        <option selected="selected" value="Published">Nyast</option>
+                                        <option value="PriceAsc">L&#228;gst pris</option>
+                                        <option value="PriceDesc">H&#246;gst pris</option>
+                                    </select>
+                                </div>
+                                <div class="grid__item one-whole lap-one-third desk-one-quarter push-half--bottom visuallyhidden--palm">
+                                    <a href="#" class="btn btn--secondary btn--rounded btn--large" id="showOnMapBtn"
+                                       rel="nofollow"><i class="object-search__pin--icon"></i>Visa karta</a>
+                                </div>
+                                <div class="grid__item one-whole lap-one-third desk-one-half float--right visuallyhidden--palm">
+                                    <a href="/bevakning/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=Sverige,Kalmar,Kalmar,Kalmar;Sverige,Kalmar,M&#246;rbyl&#229;nga,F&#228;rjestaden"
+                                       class="btn btn--primary btn--rounded btn--large float--right"
+                                       id="topSubscriptionLink">BEVAKA S&#214;KNING</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="search__results">
+                            <div>
+
+                                <div class="hits search__hits" id="searchHitsWrapper"
+                                     data-pagetitle="Hus &amp; villor till salu - Kalmar"
+                                     data-subscriptionurl="/bevakning/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=Sverige,Kalmar,Kalmar,Kalmar;Sverige,Kalmar,M&#246;rbyl&#229;nga,F&#228;rjestaden"
+                                     data-mapurl="/karta/hus/kalmar/kalmar/kalmar/?t=Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=kalmar/morbylanga/farjestaden"
+                                     data-searchlegendtext="&lt;strong&gt;10&lt;/strong&gt; &lt;strong class=&quot;search-legend__word&quot;&gt; Hus &amp; villor, Radhus, Fritidshus, Nyproduktionsprojekt, G&#229;rdar, Tomter&lt;/strong&gt; till salu - &lt;strong class=&quot;search-legend__word&quot;&gt; Kalmar, F&#228;rjestaden&lt;/strong&gt;"
+                                     data-hitcount="10" data-page="0">
+                                    <div class="grid flex__grid">
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/morbylanga/farjestaden/sagovagen-9/325814"
+                                               class="search-hit__link" data-targetid="325814">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/325814/Small/637740535530000000/MDIyNnwwMDAxMjY4NDc4MHw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">F&#228;rjestaden</h2>
+                                                            <div class="serach-hit__street h3">Sagov&#228;gen 9</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">5 rok</span>
+                                                            <span class="search-hit__info--spacer">153 kvm</span>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/kalmar/kalmar/smedby/hasselvagen-4a/321654"
+                                               class="search-hit__link" data-targetid="321654">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/321654/Small/637708404880000000/MDIyNnwwMDAxMjQ2ODU3Mnw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">Kalmar - Smedby</h2>
+                                                            <div class="serach-hit__street h3">Hasselv&#228;gen 4A</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">6 rok</span>
+                                                            <span class="search-hit__info--spacer">143 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+, Varudeklarerat
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/kalmar/kalmar/bjorkuddevagen-17/321303"
+                                               class="search-hit__link" data-targetid="321303">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/321303/Small/637698944700000000/MDIyNnwwMDAxMjQxNTkzOXw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">Kalmar</h2>
+                                                            <div class="serach-hit__street h3">Bj&#246;rkuddev&#228;gen
+                                                                17
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">160 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+, Varudeklarerat
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/kalmar/kalmar/lindsdal/nigareplan-1/317636"
+                                               class="search-hit__link" data-targetid="317636">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/317636/Small/637667009780000000/MDIyNnwwMDAxMjE2MjUxNnw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">Kalmar - Lindsdal</h2>
+                                                            <div class="serach-hit__street h3">Nigareplan 1</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">6 rok</span>
+                                                            <span class="search-hit__info--spacer">133 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+, Varudeklarerat
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/morbylanga/farjestaden/karlevi-120/313923"
+                                               class="search-hit__link" data-targetid="313923">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/313923/Small/637704265050000000/MDIyNnwwMDAxMjAzOTUyMHw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">F&#228;rjestaden</h2>
+                                                            <div class="serach-hit__street h3">Karlevi 120</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">3 rok</span>
+                                                            <span class="search-hit__info--spacer">75 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+, Varudeklarerat
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/kalmar/kalmar/gudmunds-vag-25/315144"
+                                               class="search-hit__link" data-targetid="315144">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/315144/Small/637647272370000000/MDIyNnwwMDAxMjAwMTkxNHw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">Kalmar</h2>
+                                                            <div class="serach-hit__street h3">Gudmunds v&#228;g 25
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">5 rok</span>
+                                                            <span class="search-hit__info--spacer">139 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/nyproduktionsprojekt/kalmar/morbylanga/farjestaden/oland-mellersta/brf-akerblomman/304514"
+                                               class="search-hit__link" data-targetid="304514">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/304514/Small/637562355100000000/MDIyNnwwMDAxMTM2NjE5M3w5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                            <span class="search-hit__label new-prod">Nyproduktionsprojekt</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">F&#228;rjestaden - &#214;land
+                                                                Mellersta</h2>
+                                                            <div class="serach-hit__street h3">Brf &#197;kerblomman
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i
+                                                                    class="search-hit__type--icon icon__nyproduktion"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer"> 17 bost&#228;der</span>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/nyproduktionsprojekt/kalmar/morbylanga/farjestaden/oland-mellersta/boklok-glantan/303431"
+                                               class="search-hit__link" data-targetid="303431">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/303431/Small/637552044620000000/MDIyNnwwMDAxMTI5MTU4NHw5Ng...jpg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                            <span class="search-hit__label new-prod">Nyproduktionsprojekt</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">F&#228;rjestaden - &#214;land
+                                                                Mellersta</h2>
+                                                            <div class="serach-hit__street h3">BoKlok Gl&#228;ntan</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i
+                                                                    class="search-hit__type--icon icon__nyproduktion"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer"> 32 bost&#228;der</span>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/bostadsratt/kalmar/morbylanga/farjestaden/beckstensgatan-15/254820"
+                                               class="search-hit__link" data-targetid="254820">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/254820/Small/637111519480000000/MDIyNnwwMDAwODU5OTUxMXw5Ng...png></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">F&#228;rjestaden</h2>
+                                                            <div class="serach-hit__street h3">Beckstensgatan 15</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__radhus"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">4 rok</span>
+                                                            <span class="search-hit__info--spacer">101 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                        <div class="grid__item one-whole lap-one-half desk-one-third ">
+                                            <a href="/hus/kalmar/kalmar/kalmar/forlosa/ugglerum-103/247975"
+                                               class="search-hit__link" data-targetid="247975">
+
+                                                <article class="island--white search-hit   ">
+                                                    <div class="search-hit__image--wrapper">
+                                                        <div class="search-hit__image lazy-background "
+                                                             data-src=https://si.sfcdn.se/Resurs/Image/247975/Small/637049264440000000/MDIyNnwwMDAwODE4MTkxN3w5Ng...jpeg></div>
+
+                                                        <div class="search-hit__label-wrapper--bottom">
+                                                        </div>
+                                                    </div>
+                                                    <div class="search-hit__text">
+                                                        <div class="search-hit__address">
+                                                            <h2 class="h__reset">Kalmar - F&#246;rl&#246;sa</h2>
+                                                            <div class="serach-hit__street h3">Ugglerum 103</div>
+                                                        </div>
+
+                                                        <div class="search-hit__info--text">
+                                                            <span><i class="search-hit__type--icon icon__villa"></i>&nbsp;</span>
+                                                            <span class="search-hit__info--spacer">6 rok</span>
+                                                            <span class="search-hit__info--spacer">167 kvm</span>
+
+                                                        </div>
+
+
+                                                        <div class="search-hit__products">
+                                                            L&#228;ge+, Varudeklarerat
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </article>
+
+                                            </a>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div style="clear: both;"></div>
+
+                                </div>
+                                <div class="soft--bottom"><a
+                                        href="/bevakning/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=Sverige,Kalmar,Kalmar,Kalmar;Sverige,Kalmar,M&#246;rbyl&#229;nga,F&#228;rjestaden"
+                                        class="btn btn--primary btn--rounded push-half--top">BEVAKA S&#214;KNING</a>
+                                </div>
+
+                                <div class="search__category-text">
+                                    <h2 class="h2">Hus &amp; villor, Radhus, Fritidshus, Nyproduktionsprojekt, G&#229;rdar,
+                                        Tomter - Kalmar, F&#228;rjestaden</h2>
+                                    <div class="typography">
+                                        <p>Har du n&aring;gon g&aring;ng hittat ett hus som du blivit f&ouml;r&auml;lskad
+                                            i? Du kanske bara var ute efter inredningsinspiration och inte alls hade t&auml;nkt
+                                            att <a title="K&ouml;pa hus &ndash; checklista f&ouml;r villa &amp; radhus"
+                                                   href="/kopa-bostad/hus/">k&ouml;pa hus</a>. Men s&aring; hittade du
+                                            dr&ouml;mhuset, som k&auml;ndes som en f&ouml;rl&auml;ngning av dig sj&auml;lv.
+                                            Till slut gick det inte att sl&auml;ppa tanken p&aring; det d&auml;r
+                                            perfekta huset. Huset som g&ouml;r dig alldeles pirrig, t&auml;nk att f&aring;
+                                            bo d&auml;r!</p>
+                                        <p>Bland v&aring;ra hus och villor till salu finns alla m&ouml;jliga sorters dr&ouml;mhus.
+                                            Allt fr&aring;n villor med historia i lantliga idyller, till hus med modern
+                                            arkitektur, &ouml;ppna planl&ouml;sningar och minimalistisk stil. Villor med
+                                            en, tv&aring; eller tre v&aring;ningar, stor tomt eller ingen tr&auml;dg&aring;rd,
+                                            med k&auml;llare, vind eller b&aring;da &ndash; hos oss finns det helt
+                                            enkelt n&aring;got f&ouml;r alla.</p>
+                                        <p>Tack vare att vi finns i hela landet kan du enkelt s&ouml;ka efter ett hus p&aring;
+                                            just den platsen d&auml;r du vill bo. N&auml;r du har hittat ett hus i din
+                                            smak f&aring;r du g&auml;rna g&ouml;ra en intresseanm&auml;lan. D&aring; kan
+                                            vi kontakta dig om eventuell <a
+                                                    title="Visning &ndash; tips &amp; hur det g&aring;r till"
+                                                    href="/guider/visning/">visning</a>,&nbsp;<a
+                                                    title="Budgivning &ndash; regler, taktik &amp; f&ouml;rlopp"
+                                                    href="/guider/budgivning/">budgivning</a> och annat som r&ouml;r
+                                            bostaden.&nbsp;Du &auml;r ocks&aring; v&auml;lkommen in i n&aring;gon av v&aring;ra
+                                            bobutiker, d&auml;r v&aring;ra m&auml;klare med koll p&aring; n&auml;romr&aring;det
+                                            g&auml;rna hj&auml;lper dig att hitta det hus eller villa som passar b&auml;st
+                                            f&ouml;r dig.</p>
+                                        <h2>Guider och tips f&ouml;r dig som letar hus eller villa till salu</h2>
+                                        <p>Vi p&aring; Svensk Fastighetsf&ouml;rmedling vill hj&auml;lpa dig att hitta
+                                            ditt dr&ouml;mhus. D&auml;rf&ouml;r har vi tagit fram flera <a
+                                                    title="Guider f&ouml;r din bostadsaff&auml;r"
+                                                    href="/guider/">guider</a> som ger dig svar p&aring; mycket av det
+                                            du undrar n&auml;r du g&aring;r i bostadsk&ouml;ptankar. I guiderna kan du
+                                            bland annat l&auml;sa mer om <a
+                                                    title="L&aring;nel&ouml;fte &ndash; att ans&ouml;ka hos bank"
+                                                    href="/lana/lanelofte/">l&aring;nel&ouml;fte</a>, <a
+                                                    title="Bol&aring;n &ndash; tips f&ouml;r bostadsl&aring;n"
+                                                    href="/lana/bolan/">bol&aring;n</a>&nbsp;och vad som egentligen p&aring;verkar
+                                            <a title="Bostadspriser &ndash; statistik &amp; prognos"
+                                               href="/guider/bostadspriser/">bostadspriserna</a>.&nbsp;Och om det &auml;r
+                                            n&aring;got mer du funderar &ouml;ver &auml;r du sj&auml;lvklart alltid v&auml;lkommen
+                                            att prata med v&aring;ra <a title="Hitta m&auml;klare"
+                                                                        href="/hitta-maklare/">m&auml;klare</a>.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <nav class="search__related">
+                                <h2 class="h2 search__related__headline">L&#228;n</h2>
+                                <ul class="search__related__items">
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/">Kalmar
+                                        (kommun)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/forlosa/">F&#246;rl&#246;sa,
+                                        Kalmar (omr&#229;de)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/kalmar-centralt/">Kalmar
+                                        Centralt, Kalmar (omr&#229;de)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/kalmar-norr/">Kalmar
+                                        Norr, Kalmar (omr&#229;de)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/lindsdal/">Lindsdal,
+                                        Kalmar (omr&#229;de)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/smedby/">Smedby,
+                                        Kalmar (omr&#229;de)</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostad/kalmar/kalmar/kalmar/soder-om-jarnvagen/">S&#246;der
+                                        Om J&#228;rnv&#228;gen, Kalmar (omr&#229;de)</a></li>
+                                </ul>
+                            </nav>
+                            <nav class="search__related">
+                                <h2 class="h2 search__related__headline">Bostadstyper</h2>
+                                <ul class="search__related__items">
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostadsratt/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Bostadsr&#228;tt</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/kommersiellt/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Kommersiell
+                                        fastighet</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/bostadsfastighet/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Bostadsfastighet</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/butiksfastighet/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Butiksfastighet</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/hyreslokal/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Hyreslokal</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/hastgard-boendelantbruk/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">H&#228;stg&#229;rd
+                                        &amp; Boendelantbruk</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/industrifastighet/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Industrifastighet</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/kommersiell-tomt/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Kommersiell
+                                        tomt</a></li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/kontorsfastighet/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Kontorsfastighet</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/lokal/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Lokal</a>
+                                    </li>
+                                    <li class="search__related__item"><a class="go--before"
+                                                                         href="/skog-mark/kalmar/kalmar/kalmar/?l=kalmar/morbylanga/farjestaden">Skog
+                                        &amp; Mark</a></li>
+                                </ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div id="stickySearchLegendContainer" class="search-object__sticky--legend">
+        <div class="grid-wrapper">
+            <div class="grid">
+                <div class="grid__item">
+                    <div class="search-legend__table">
+                        <div class="search-legend__table-cell--left">
+                            <a href="#top" id="stickySearchLegendLink" class="search-legend__filter--wrapper">
+                                <span id="stickySearchLegendText" class="hide--palm"></span>
+                                <span class="hide--lap hide--desk">Filter (<span id="stickySearchLegendCount">0</span>)</span>
+                            </a>
+                        </div>
+                        <div class="search-legend__table-cell--right">
+                            <a href="/bevakning/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&amp;l=Sverige,Kalmar,Kalmar,Kalmar;Sverige,Kalmar,M&#246;rbyl&#229;nga,F&#228;rjestaden"
+                               class="btn btn--primary btn--rounded btn--small" id="stickySubscriptionLink">BEVAKA S&#214;KNING</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="searchLegendMirror" class="search-object__sticky-bottom--legend">
+        <div class="grid-wrapper">
+            <div class="grid">
+                <div class="grid__item one-whole lap-and-up-three-quarters search-object__sticky-bottom--text"
+                     id="searchLegendMirrorText"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+  (function (win) {
+    window.initLazyBackgrounds = function () {
+      var lazyBackgrounds = [].slice.call(document.querySelectorAll(".lazy-background"));
+      var imageSize = function () {
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
+
+        if (width <= 767) {
+          return "small";
+        } else if (width <= 1024) {
+          return "medium";
+        } else {
+          return "large";
+        }
+      };
+      var imageVersion = imageSize();
+      var canUseWebp = Modernizr.webp; //Do the browser support webp?
+
+      if ("IntersectionObserver" in window) {
+        let lazyBackgroundObserver = new IntersectionObserver(function (entries, observer) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              if (entry.target.dataset.src) {
+                if (canUseWebp && entry.target.dataset.srcwebp) {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srcwebp + ')';
+                } else {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.src + ')';
+                }
+              } else if (imageVersion == "small") {
+                if (canUseWebp && entry.target.dataset.srcsmallwebp) {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srcsmallwebp + ')';
+                } else {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srcsmall + ')';
+                }
+              } else if (imageVersion == "medium") {
+                if (canUseWebp && entry.target.dataset.srcmediumwebp) {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srcmediumwebp + ')';
+                } else {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srcmedium + ')';
+                }
+              } else {
+                if (canUseWebp && entry.target.dataset.srclargewebp) {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srclargewebp + ')';
+                } else {
+                  entry.target.style.backgroundImage = 'url(' + entry.target.dataset.srclarge + ')';
+                }
+              }
+              entry.target.classList.remove("lazy-background");
+              lazyBackgroundObserver.unobserve(entry.target);
+            }
+          });
+        });
+
+        lazyBackgrounds.forEach(function (lazyBackground) {
+          lazyBackgroundObserver.observe(lazyBackground);
+        });
+      } else {
+        //Fallback
+        let active = false;
+
+        const lazyLoadBackgrounds = function () {
+          if (active === false) {
+            active = true;
+
+            setTimeout(function () {
+              lazyBackgrounds.forEach(function (lazyBackground) {
+                if ((lazyBackground.getBoundingClientRect().top <= window.innerHeight && lazyBackground.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyBackground).display !== "none") {
+                  if (lazyBackground.dataset.src) {
+                    if (canUseWebp && lazyBackground.dataset.srcwebp) {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srcwebp + ')';
+                    } else {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.src + ')';
+                    }
+                  } else if (imageVersion == "small") {
+                    if (canUseWebp && lazyBackground.dataset.srcsmallwebp) {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srcsmallwebp + ')';
+                    } else {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srcsmall + ')';
+                    }
+                  } else if (imageVersion == "medium") {
+                    if (canUseWebp && lazyBackground.dataset.srcmediumwebp) {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srcmediumwebp + ')';
+                    } else {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srcmedium + ')';
+                    }
+                  } else {
+                    if (canUseWebp && lazyBackground.dataset.srclargewebp) {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srclargewebp + ')';
+                    } else {
+                      lazyBackground.style.backgroundImage = 'url(' + lazyBackground.dataset.srclarge + ')';
+                    }
+                  }
+
+                  lazyBackground.classList.remove("lazy-background");
+
+                  lazyBackgrounds = lazyBackgrounds.filter(function (node) {
+                    return node !== lazyBackground;
+                  });
+
+                  if (lazyBackgrounds.length === 0) {
+                    document.removeEventListener("scroll", lazyLoadBackgrounds);
+                    window.removeEventListener("resize", lazyLoadBackgrounds);
+                    window.removeEventListener("orientationchange", lazyLoadBackgrounds);
+                  }
+                }
+              });
+
+              active = false;
+            }, 200);
+          }
+        };
+
+        document.addEventListener("scroll", lazyLoadBackgrounds);
+        window.addEventListener("resize", lazyLoadBackgrounds);
+        window.addEventListener("orientationchange", lazyLoadBackgrounds);
+        lazyLoadBackgrounds();
+      }
+    };
+    document.addEventListener("DOMContentLoaded", function () {
+      initLazyBackgrounds();
+    });
+  })(window);
+
+  (function (win) {
+    window.initLazyImages = function () {
+      var lazyImages = [].slice.call(document.querySelectorAll(".lazy-image"));
+      var imageSize = function () {
+        var width = (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
+
+        if (width <= 767) {
+          return "small";
+        } else if (width <= 1024) {
+          return "medium";
+        } else {
+          return "large";
+        }
+      };
+      var imageVersion = imageSize();
+      var canUseWebp = Modernizr.webp; //Do the browser support webp?
+
+      if ("IntersectionObserver" in window) {
+        let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              if (imageVersion == "small") {
+                if (canUseWebp && entry.target.dataset.srcsmallwebp) {
+                  entry.target.src = entry.target.dataset.srcsmallwebp;
+                } else {
+                  entry.target.src = entry.target.dataset.srcsmall;
+                }
+              } else if (imageVersion == "medium") {
+                if (canUseWebp && entry.target.dataset.srcmediumwebp) {
+                  entry.target.src = entry.target.dataset.srcmediumwebp;
+                } else {
+                  entry.target.src = entry.target.dataset.srcmedium;
+                }
+              } else {
+                if (canUseWebp && entry.target.dataset.srclargewebp) {
+                  entry.target.src = entry.target.dataset.srclargewebp;
+                } else {
+                  entry.target.src = entry.target.dataset.srclarge;
+                }
+              }
+              entry.target.classList.remove("lazy-image");
+              lazyImageObserver.unobserve(entry.target);
+            }
+          });
+        });
+
+        lazyImages.forEach(function (lazyImage) {
+          lazyImageObserver.observe(lazyImage);
+        });
+      } else {
+        //Fallback
+        let active = false;
+
+        const lazyLoadImages = function () {
+          if (active === false) {
+            active = true;
+
+            setTimeout(function () {
+              lazyImages.forEach(function (lazyImage) {
+                if ((lazyImage.getBoundingClientRect().top <= window.innerHeight && lazyImage.getBoundingClientRect().bottom >= 0) && getComputedStyle(lazyImage).display !== "none") {
+                  if (imageVersion == "small") {
+                    if (canUseWebp && lazyImage.dataset.srcsmallwebp) {
+                      lazyImage.src = lazyImage.dataset.srcsmallwebp;
+                    } else {
+                      lazyImage.src = lazyImage.dataset.srcsmall;
+                    }
+                  } else if (imageVersion == "medium") {
+                    if (canUseWebp && lazyImage.dataset.srcmediumwebp) {
+                      lazyImage.src = lazyImage.dataset.srcmediumwebp;
+                    } else {
+                      lazyImage.src = lazyImage.dataset.srcmedium;
+                    }
+                  } else {
+                    if (canUseWebp && lazyImage.dataset.srclargewebp) {
+                      lazyImage.src = lazyImage.dataset.srclargewebp;
+                    } else {
+                      lazyImage.src = lazyImage.dataset.srclarge;
+                    }
+                  }
+                  lazyImage.classList.remove("lazy-image");
+
+                  lazyImages = lazyImages.filter(function (node) {
+                    return node !== lazyImage;
+                  });
+
+                  if (lazyImages.length === 0) {
+                    document.removeEventListener("scroll", lazyLoadImages);
+                    window.removeEventListener("resize", lazyLoadImages);
+                    window.removeEventListener("orientationchange", lazyLoadImages);
+                  }
+                }
+              });
+
+              active = false;
+            }, 200);
+          }
+        };
+
+        document.addEventListener("scroll", lazyLoadImages);
+        window.addEventListener("resize", lazyLoadImages);
+        window.addEventListener("orientationchange", lazyLoadImages);
+        lazyLoadImages();
+      }
+    };
+    document.addEventListener("DOMContentLoaded", function () {
+      initLazyImages();
+    });
+  })(window);
+</script>
+
+
+<footer class="footer-wrapper" role="contentinfo">
+
+    <div class="footer__valuation--wrapper soft--ends-medium" id="valuationLinkWithinFooter">
+        <div class="grid-wrapper">
+            <div class="grid">
+                <div class="grid__item one-whole lap-one-whole desk-two-thirds">
+                    <div class="footer__valuation--text-context">
+                        <div class="footer__valuation--header">
+                            <h2 class="h2">Prenumerera p&#229; v&#229;rt nyhetsbrev</h2>
+                        </div>
+                        <div class="footer__valuation--text">F&#229; nyheter, guider och inspiration om
+                            bostadsmarknaden.
+                        </div>
+                    </div>
+                </div>
+                <div class="grid__item one-whole lap-one-third desk-one-third push-half--top float--right">
+                    <a href="/tjanster/nyhetsbrev/"
+                       class="btn btn--primary btn--rounded btn--large footer__valuation--button">Prenumerera</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer__content--wrapper">
+        <div class="grid-wrapper">
+            <hr class="hr--dash__white flush--bottom"/>
+        </div>
+    </div>
+
+    <div class="footer__content--wrapper soft--top">
+        <div class="grid-wrapper">
+            <div class="footer-links_wrapper push--ends">
+                <div class="grid">
+
+                    <div class="grid__item one-whole lap-and-up-one-half">
+                        <div class="grid">
+                            <div class="grid__item desk-one-half push--bottom">
+                                <h2 class="h__label">Kontakt</h2>
+                                <ul class="nav">
+
+                                    <li><a class="" href="/kontakt/kundservice/">Kundservice</a></li>
+                                    <li><a class="" href="/hitta-maklare/">Hitta m&#228;klare</a></li>
+                                    <li><a class="" href="/salja-nyproduktion/#team">F&#246;r byggbolag</a></li>
+                                    <li><a class="" href="/kontakt/">Huvudkontoret</a></li>
+                                    <li><a class="" href="/vardera-bostad/">V&#228;rdera bostad</a></li>
+                                </ul>
+                            </div>
+                            <div class="grid__item desk-one-half">
+                                <h2 class="h__label">Genv&#228;gar</h2>
+                                <ul class="nav">
+                                    <li><a class="external" target="_blank" href="https://jobb.svenskfast.se/">Jobba hos
+                                        oss</a></li>
+                                    <li><a class="external" target="_blank"
+                                           href="https://press.svenskfast.se/">Pressrum</a></li>
+                                    <li><a class="external" target="_blank"
+                                           href="https://blogg.svenskfast.se/">Bloggen</a></li>
+                                    <li><a class="" href="/tjanster/">Tj&#228;nster</a></li>
+                                    <li><a class="" href="/guider/">Guider</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="soft-half--ends show--palm">
+
+                        </div>
+                    </div>
+                    <div class="grid__item one-whole lap-and-up-one-half footer-links__text">
+                        <h2 class="h__label">Om Svensk Fastighetsf&#246;rmedling</h2>
+                        <div class="hide--palm">Fr&#229;n starten 1937 har vi v&#228;xt till ett av landets st&#246;rsta
+                            m&#228;klarf&#246;retag. N&#228;r vi idag f&#246;rmedlar bost&#228;der,
+                            nyproduktionsprojekt, skog &amp; lantbruk och kommersiella fastigheter &#246;ver hela
+                            Sverige och i Spanien s&#229; &#228;r ambitionen fortsatt densamma, att erbjuda kunderna den
+                            b&#228;sta m&#228;klartj&#228;nsten.
+                        </div>
+                        <div class="push-half--top"><a class="" href="/om-oss/">L&#228;s mer om oss</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="soft-half--ends">
+
+            </div>
+            <div class="grid">
+                <div class="footer__social--wrapper">
+                    <div class="grid__item one-whole desk-one-half push--bottom">
+                        <a href="https://www.reco.se/svenskfast" target="_blank" rel="nofollow">
+                            <div class="footer-reco">
+                                <h2 class="h2">
+                                    <span>4,8</span> <span>av 5</span>
+                                </h2>
+                                <div class="smallprint">Svensk Fastighetsförmedlings samlade betyg</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="grid__item one-whole desk-one-half footer-social">
+
+                        <ul class="nav">
+                            <li><a target="_blank" href="https://www.facebook.com/svenskfast/" title="Facebook"><i
+                                    class="icon"></i></a></li>
+                            <li><a target="_blank" href="https://twitter.com/svenskfast/" title="Twitter"><i
+                                    class="icon"></i></a></li>
+                            <li><a target="_blank" href="https://www.youtube.com/user/Svenskfast" title="Youtube"><i
+                                    class="icon"></i></a></li>
+                            <li><a target="_blank" href="https://www.instagram.com/svenskfast/" title="Instagram"><i
+                                    class="icon"></i></a></li>
+                            <li><a target="_blank" href="https://www.pinterest.se/svenskfastighetsformedling/"
+                                   title="Pinterest"><i class="icon"></i></a></li>
+                            <li><a target="_blank"
+                                   href="https://www.houzz.se/pro/svenskfast/svensk-fastighetsfoermedling"
+                                   title="Houzz"><i class="icon"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer__lower--wrapper">
+        <div class="grid-wrapper">
+            <div>
+                <hr class="hr--dash__white"/>
+            </div>
+            <div class="grid">
+                <div class="grid__item one-whole desk-one-third">
+                    <div class="footer__lower--copyright">© 2021 SVENSK FASTIGHETSFÖRMEDLING AB</div>
+                </div>
+                <div class="grid__item one-whole desk-two-thirds">
+                    <div class="footer_lower-list">
+                        <ul>
+                            <li><a href=/om-oss/integritetspolicy/> Integritetspolicy </a></li>
+                            <li><a href=/om-oss/bevarandepolicy/> Bevarandepolicy </a></li>
+                            <li><a href=/om-oss/anvandarvillkor/> Anv&#228;ndarvillkor </a></li>
+                            <li><a href=/om-oss/cookies/> Cookies </a></li>
+                            <li><a href=mailto:webmaster@svenskfast.se> Webmaster </a></li>
+                            <li><a id="ot-sdk-btn" class="ot-sdk-show-settings">Cookie Settings</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script>
+  window.sf = window.sf || {};
+  window.sf.jsPaths = {
+    'sf.large-screen': 'https://su.sfcdn.se/ui/javascripts/dist/sf.large-screen.min.md5.be5e7e446f9fb34e6338b0686823263f.js',
+    'sf.small-screen': 'https://su.sfcdn.se/ui/javascripts/dist/sf.small-screen.min.md5.7c4d3150e90eb8d5ca307eb001558bdc.js'
+  };
+</script>
+
+<script id="carouselScript"></script>
+<script id="sfScript"></script>
+<script id="sfVScript"></script>
+<script>
+  (function getScripts() {
+    var carouselScript = document.getElementById('carouselScript');
+    var sfVendorScript = document.getElementById('sfVScript');
+    var sfScript = document.getElementById('sfScript');
+
+    if (Modernizr.touchevents) {
+      carouselScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf.touch.min.md5.f17129ed37b6d969632789f30af401e7.js';
+    } else {
+      carouselScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf.no-touch.min.md5.669c56421788ecddfa105429da02967b.js';
+    }
+
+    carouselScript.onload = function () {
+      if (document.getElementById('object-page')) {
+        sfVendorScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-v.min.md5.4a0f5695847a52716a62358f93a80b39.js';
+        //sfScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf.min.md5.5f659dfa06b7a163118a44b317983589.js';
+      } else {
+        sfVendorScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-content-v.min.md5.4eae1b99f4e5d78c6e59eca638be35cd.js';
+        //sfScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-content.min.md5.4d86b741d4088d3793143697434f0c2e.js';
+      }
+    }
+
+    sfVendorScript.onload = function () {
+      if (document.getElementById('object-page')) {
+        //sfVendorScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-v.min.md5.4a0f5695847a52716a62358f93a80b39.js';
+        sfScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf.min.md5.5f659dfa06b7a163118a44b317983589.js';
+      } else {
+        //sfVendorScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-content-v.min.md5.4eae1b99f4e5d78c6e59eca638be35cd.js';
+        sfScript.src = 'https://su.sfcdn.se/ui/javascripts/dist/sf-content.min.md5.4d86b741d4088d3793143697434f0c2e.js';
+      }
+    }
+  })();
+</script>
+
+
+<!-- To remove console errors on pages with epiforms epi is not defined
+at initializeOnRenderingFormDescriptor (GetFormInitScript?formGuid=fff70362-3b89-4905-b75e-ff001f22c722&formLanguage=sv:7)-->
+
+<script>
+  (function () {
+    function addFont() {
+      var style = document.createElement('style');
+      style.rel = 'stylesheet';
+      document.head.appendChild(style);
+      style.textContent = localStorage.sfBrandFonts;
+    }
+
+    try {
+      if (localStorage.sfBrandFonts) {
+        // The font is in localStorage, we can load it directly
+        addFont();
+      } else {
+        // We have to first load the font file asynchronously
+        var request = new XMLHttpRequest();
+        request.open('GET', 'https://su.sfcdn.se/ui/stylesheets/sf-web-fonts.min.css');
+
+        request.onload = function () {
+          if (request.status >= 200 && request.status < 400) {
+            // We save the file in localStorage
+            localStorage.sfBrandFonts = request.responseText;
+
+            // ... and load the font
+            addFont();
+          }
+        }
+
+        request.send();
+      }
+    } catch (ex) {
+      // maybe load the font synchronously for woff-capable browsers
+      // to avoid blinking on every request when localStorage is not available
+    }
+  }());
+</script>
+
+
+</body>
+</html>

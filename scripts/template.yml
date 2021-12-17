@@ -1,0 +1,48 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Checks for new homes
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: ./lambda
+      Runtime: go1.x
+      CodeUri: ./build
+      Description: Check for homes
+      Timeout: 15
+      # Function's execution role
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - AWSXrayWriteOnlyAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:*
+              Resource: arn:aws:s3:::byrnedo-homefinder/*
+      Environment:
+        Variables:
+          BUCKET: byrnedo-homefinder
+          SLACK_WEBHOOK_URL: $SLACK_WEBHOOK_URL
+      Tracing: Active
+  CronEvent: #logical name of the resource
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: cron(0/15 * * * ? *) #when the event should trigger
+      Targets:
+        - Arn:
+            Fn::GetAtt: [ function , "Arn" ] #reference the lambda function by its arn
+          Id:
+            Ref: function #unique name of the target
+  LambdaInvokePermission: #logical name of the resource
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt: [ function ,"Arn" ] #reference the lambda function by its arn
+      Action: lambda:InvokeFunction #allow invoking of lambda functions
+      Principal: events.amazonaws.com #grant permission to the events system
+      SourceArn:
+        Fn::GetAtt: [ CronEvent , "Arn" ] #define which event is allowed to trigger lambdas
+

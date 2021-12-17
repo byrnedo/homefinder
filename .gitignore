@@ -1,0 +1,7 @@
+.idea
+.env
+vendor
+listings-seen
+out.yml
+scripts/build/*
+!scripts/build/.gitkeep
