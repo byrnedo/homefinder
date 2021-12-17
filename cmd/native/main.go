@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"gitlab.com/donalbyrne/homefinder/internal/app"
+	"github.com/byrnedo/homefinder/internal/app"
 )
 
 func main() {

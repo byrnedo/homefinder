@@ -2,7 +2,7 @@ package pontuz
 
 import (
 	_ "embed"
-	"gitlab.com/donalbyrne/homefinder/internal/agents"
+	"github.com/byrnedo/homefinder/internal/agents"
 	"testing"
 )
 

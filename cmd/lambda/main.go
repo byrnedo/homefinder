@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"gitlab.com/donalbyrne/homefinder/internal/app"
+	"github.com/byrnedo/homefinder/internal/app"
 	"io/ioutil"
 	"log"
 	"os"

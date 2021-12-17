@@ -3,7 +3,7 @@ package fastighetsbyran
 import (
 	"encoding/json"
 	"fmt"
-	"gitlab.com/donalbyrne/homefinder/internal/agents"
+	"github.com/byrnedo/homefinder/internal/agents"
 	"io/ioutil"
 	"net/http"
 	"strconv"

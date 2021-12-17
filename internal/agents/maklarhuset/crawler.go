@@ -2,7 +2,7 @@ package maklarhuset
 
 import (
 	css "github.com/andybalholm/cascadia"
-	"gitlab.com/donalbyrne/homefinder/internal/agents"
+	"github.com/byrnedo/homefinder/internal/agents"
 	"golang.org/x/net/html"
 	"io/ioutil"
 	"net/http"
