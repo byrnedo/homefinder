@@ -1,14 +1,15 @@
-package rydmanlanga
+package pontuz
 
 import (
-	css "github.com/andybalholm/cascadia"
-	"github.com/byrnedo/homefinder/internal/agents"
-	"golang.org/x/net/html"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+
+	css "github.com/andybalholm/cascadia"
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"golang.org/x/net/html"
 )
 
 type Crawler struct {
@@ -16,12 +17,12 @@ type Crawler struct {
 }
 
 func (p Crawler) Name() string {
-	return "Rydman Langå"
+	return "Pontuz Löfgren"
 }
 
 func (p *Crawler) fetch() error {
 
-	res, err := http.DefaultClient.Get("https://www.rydmanlanga.se/till-salu")
+	res, err := http.DefaultClient.Get("https://www.pontuzlofgren.se/till-salu")
 	if err != nil {
 		return nil
 	}
@@ -42,18 +43,33 @@ func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 	if err != nil {
 		return nil, err
 	}
-	nodes := css.QueryAll(n, css.MustCompile("body div.ol-wrapper div.col"))
+	nodes := css.QueryAll(n, css.MustCompile("body>div.wrapper>div.ol-wrapper.container>div.col"))
 	if len(nodes) == 0 {
-		return nil, agents.NotFoundErr{}
+		return nil, agents.NotFoundErr{"body>div.wrapper>div.ol-wrapper.container>div.col"}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
 	for _, n = range nodes {
+
+		var listingType agents.ListingType
+		if agents.HasClass(n, "house") {
+			listingType = agents.ListingTypeHouse
+		} else if agents.HasClass(n, "project") {
+			listingType = agents.ListingTypeProject
+		} else if agents.HasClass(n, "housingcooperative") {
+			continue
+		} else if agents.HasClass(n, "plot") {
+			listingType = agents.ListingTypePlot
+		} else {
+			listingType = agents.ListingTypeUnknown
+		}
+
 		a := css.Query(n, css.MustCompile("a"))
 		img := css.Query(n, css.MustCompile("img"))
 		listing := agents.Listing{
 			Upcoming: agents.CollectText(css.Query(n, css.MustCompile("div.oc-badge"))) == "I startblocken",
 			Link:     agents.FindAttr(a, "href"),
 			Image:    agents.FindAttr(img, "src"),
+			Type:     listingType,
 		}
 
 		title := agents.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))

@@ -3,11 +3,12 @@ package fastighetsbyran
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/byrnedo/homefinder/internal/agents"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
 )
 
 type Crawler struct {

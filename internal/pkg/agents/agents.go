@@ -1,9 +1,10 @@
 package agents
 
 import (
-	"golang.org/x/net/html"
 	"regexp"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
 type ListingType string

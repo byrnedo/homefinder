@@ -1,13 +1,14 @@
 package svenskfast
 
 import (
-	css "github.com/andybalholm/cascadia"
-	"github.com/byrnedo/homefinder/internal/agents"
-	"golang.org/x/net/html"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
+
+	css "github.com/andybalholm/cascadia"
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"golang.org/x/net/html"
 )
 
 type Crawler struct {

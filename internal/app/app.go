@@ -5,23 +5,25 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/byrnedo/homefinder/internal/agents/fastighetsbyran"
-	"github.com/byrnedo/homefinder/internal/agents/maklarhuset"
-	"github.com/byrnedo/homefinder/internal/agents/olands"
-	"github.com/byrnedo/homefinder/internal/agents/svenskfast"
 	"log"
 	"os"
 	"strings"
 
-	"github.com/byrnedo/homefinder/internal/agents"
-	"github.com/byrnedo/homefinder/internal/agents/pontuz"
-	"github.com/byrnedo/homefinder/internal/agents/rydmanlanga"
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/fastighetsbyran"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/maklarhuset"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/olands"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/pontuz"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/rydmanlanga"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/svenskfast"
+	"github.com/byrnedo/homefinder/internal/pkg/repos"
+
 	"github.com/slack-go/slack"
 )
 
 const FileName = "/tmp/listings-seen"
 
-func Run(ctx context.Context) {
+func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 	crawlers := []agents.Crawler{
 		&pontuz.Crawler{},
 		&rydmanlanga.Crawler{},
@@ -31,12 +33,12 @@ func Run(ctx context.Context) {
 		&maklarhuset.Crawler{},
 	}
 
-	prevListings, err := loadFromDisk()
+	prevListings, err := historyRepo.GetHistory(ctx)
 	if err != nil {
 		panic("failed to load from disk:" + err.Error())
 	}
 
-	curListings := map[string]bool{}
+	curListings := map[string]repos.Void{}
 
 	var newListings []agents.Listing
 	for _, c := range crawlers {
@@ -49,7 +51,7 @@ func Run(ctx context.Context) {
 
 		for _, listing := range listings {
 
-			curListings[c.Name()+":"+listing.Name] = true
+			curListings[c.Name()+":"+listing.Name] = repos.Void{}
 
 			if _, ok := prevListings[c.Name()+":"+listing.Name]; !ok {
 				// new listings
@@ -127,7 +129,7 @@ func Run(ctx context.Context) {
 		panic(err)
 	}
 
-	if err := saveToDisk(curListings); err != nil {
+	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
 		panic("failed to save to disk:" + err.Error())
 	}
 

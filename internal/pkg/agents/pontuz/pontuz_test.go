@@ -2,8 +2,9 @@ package pontuz
 
 import (
 	_ "embed"
-	"github.com/byrnedo/homefinder/internal/agents"
 	"testing"
+
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
 )
 
 //go:embed index.html
