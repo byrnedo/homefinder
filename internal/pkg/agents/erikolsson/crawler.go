@@ -67,7 +67,7 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 
 	for _, item := range result.Properties {
 		listings = append(listings, agents.Listing{
-			Name:         strings.Join([]string{item.Address, item.AreaName}, ","),
+			Name:         strings.Join([]string{item.Address, item.AreaName + "(" + item.VitecObjectId + ")"}, ","),
 			Link:         "https://www.erikolsson.se" + item.Url,
 			Type:         c.parseType(item),
 			Image:        item.MainImageUrl,
