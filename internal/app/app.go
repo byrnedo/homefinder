@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/erikolsson"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/fastighetsbyran"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/maklarhuset"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/olands"
@@ -31,6 +32,7 @@ func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 		&olands.Crawler{},
 		&svenskfast.Crawler{},
 		&maklarhuset.Crawler{},
+		&erikolsson.Crawler{},
 	}
 
 	prevListings, err := historyRepo.GetHistory(ctx)
