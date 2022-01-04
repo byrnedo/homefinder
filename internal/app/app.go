@@ -1,10 +1,8 @@
 package app
 
 import (
-	"bufio"
 	"context"
-	"encoding/json"
-	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -17,14 +15,21 @@ import (
 	"github.com/byrnedo/homefinder/internal/pkg/agents/pontuz"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/rydmanlanga"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/svenskfast"
+	"github.com/byrnedo/homefinder/internal/pkg/jobs"
+	"github.com/byrnedo/homefinder/internal/pkg/jobs/indeed"
 	"github.com/byrnedo/homefinder/internal/pkg/repos"
 
 	"github.com/slack-go/slack"
 )
 
-const FileName = "/tmp/listings-seen"
+func dashIfEmpty(s string) string {
+	if strings.TrimSpace(s) == "" {
+		return "-"
+	}
+	return s
+}
 
-func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
+func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	crawlers := []agents.Crawler{
 		&pontuz.Crawler{},
 		&rydmanlanga.Crawler{},
@@ -37,7 +42,7 @@ func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 
 	prevListings, err := historyRepo.GetHistory(ctx)
 	if err != nil {
-		panic("failed to load from disk:" + err.Error())
+		return fmt.Errorf("failed to load from disk: %s", err)
 	}
 
 	curListings := map[string]repos.Void{}
@@ -47,7 +52,7 @@ func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 		log.Println("checking " + c.Name() + "...")
 		listings, err := c.GetForSale()
 		if err != nil {
-			panic(err)
+			return err
 		}
 		log.Printf("found %d listings for %s\n", len(listings), c.Name())
 
@@ -69,6 +74,93 @@ func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 		var blocks []slack.Block
 		for i, l := range newListings {
 			facts := strings.Join(l.Facts, " - ")
+			blocks = append(blocks, slack.SectionBlock{
+				Type: slack.MBTSection,
+				Fields: []*slack.TextBlockObject{
+					{
+						Type: slack.MarkdownType,
+						Text: dashIfEmpty(l.Name),
+					},
+					{
+						Type: slack.MarkdownType,
+						Text: dashIfEmpty(facts),
+					},
+					{
+						Type: slack.MarkdownType,
+						Text: dashIfEmpty(l.Link),
+					},
+					{
+						Type: slack.MarkdownType,
+						Text: dashIfEmpty(string(l.Type)),
+					},
+				},
+				Accessory: &slack.Accessory{
+					ImageElement: &slack.ImageBlockElement{
+						Type:     slack.METImage,
+						ImageURL: dashIfEmpty(l.Image),
+						AltText:  dashIfEmpty(l.Name),
+					},
+				},
+			})
+			if i > 0 && i%49 == 0 {
+				if err = postToSlack(ctx, blocks, ""); err != nil {
+					return err
+				}
+				blocks = nil
+			}
+		}
+		if blocks != nil {
+			if err = postToSlack(ctx, blocks, ""); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
+		return err
+	}
+	return nil
+}
+
+func RunJobfinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
+	crawlers := []jobs.Crawler{
+		&indeed.Crawler{},
+	}
+
+	prevListings, err := historyRepo.GetHistory(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to load from disk: %w", err)
+	}
+
+	curListings := map[string]repos.Void{}
+
+	var newListings []jobs.Listing
+	for _, c := range crawlers {
+		log.Println("JOBS: checking " + c.Name() + "...")
+		listings, err := c.GetJobs()
+		if err != nil {
+			return err
+		}
+		log.Printf("JOBS: found %d listings for %s\n", len(listings), c.Name())
+
+		for _, listing := range listings {
+
+			curListings[c.Name()+":"+listing.Name] = repos.Void{}
+
+			if _, ok := prevListings[c.Name()+":"+listing.ID]; !ok {
+				// new listings
+				newListings = append(newListings, listing)
+				//
+			}
+		}
+	}
+
+	log.Printf("JOBS: found %d new job listings\n", len(newListings))
+
+	if len(newListings) > 0 {
+		var blocks []slack.Block
+		for i, l := range newListings {
+			facts := strings.Join(l.Facts, " - ")
 			if facts == "" {
 				facts = "-"
 			}
@@ -80,99 +172,53 @@ func Run(ctx context.Context, historyRepo repos.HistoryRepo) {
 				Fields: []*slack.TextBlockObject{
 					{
 						Type: slack.MarkdownType,
-						Text: l.Name,
+						Text: dashIfEmpty(l.Name),
 					},
 					{
 						Type: slack.MarkdownType,
-						Text: facts,
+						Text: dashIfEmpty(facts),
 					},
 					{
 						Type: slack.MarkdownType,
-						Text: l.Link,
+						Text: dashIfEmpty(l.Location),
 					},
 					{
 						Type: slack.MarkdownType,
-						Text: string(l.Type),
+						Text: fmt.Sprintf(`<%s|Application>`, l.Link),
 					},
-				},
-				Accessory: &slack.Accessory{
-					ImageElement: &slack.ImageBlockElement{
-						Type:     slack.METImage,
-						ImageURL: l.Image,
-						AltText:  l.Name,
+					{
+						Type: slack.MarkdownType,
+						Text: dashIfEmpty(string(l.Type)),
 					},
 				},
 			})
-			if i > 0 && i%50 == 0 {
-				msg := &slack.WebhookMessage{
-					Blocks: &slack.Blocks{
-						BlockSet: blocks,
-					},
+			if i > 0 && i%49 == 0 {
+				if err := postToSlack(ctx, blocks, "#ellen-jobs"); err != nil {
+					return err
 				}
-				b, _ := json.MarshalIndent(msg, "", "  ")
-				log.Println(string(b))
-				err = slack.PostWebhookContext(ctx, os.Getenv("SLACK_WEBHOOK_URL"), msg)
 				blocks = nil
 			}
 		}
 		if blocks != nil {
-			msg := &slack.WebhookMessage{
-				Blocks: &slack.Blocks{
-					BlockSet: blocks,
-				},
+			if err := postToSlack(ctx, blocks, "#ellen-jobs"); err != nil {
+				return err
 			}
-			b, _ := json.MarshalIndent(msg, "", "  ")
-			log.Println(string(b))
-			err = slack.PostWebhookContext(ctx, os.Getenv("SLACK_WEBHOOK_URL"), msg)
 		}
-	}
-
-	if err != nil {
-		panic(err)
 	}
 
 	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
-		panic("failed to save to disk:" + err.Error())
-	}
-
-}
-
-func loadFromDisk() (map[string]bool, error) {
-	f, err := os.OpenFile(FileName, os.O_RDONLY, 0644)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return map[string]bool{}, nil
-		}
-		return nil, err
-	}
-	defer f.Close()
-
-	m := map[string]bool{}
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		text := scanner.Text()
-		m[text] = true
-
-	}
-	return m, nil
-}
-
-func saveToDisk(ls map[string]bool) error {
-	f, err := os.OpenFile(FileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
-	if err != nil {
 		return err
 	}
-	defer f.Close()
+	return nil
 
-	f.Truncate(0)
-	f.Seek(0, 0)
-	writer := bufio.NewWriter(f)
-	for k, _ := range ls {
+}
 
-		writer.WriteString(k + "\n")
-		if err != nil {
-			return err
-		}
+func postToSlack(ctx context.Context, blocks []slack.Block, channel string) error {
+	msg := &slack.WebhookMessage{
+		Channel: channel,
+		Blocks: &slack.Blocks{
+			BlockSet: blocks,
+		},
 	}
-	return writer.Flush()
+	return slack.PostWebhookContext(ctx, os.Getenv("SLACK_WEBHOOK_URL"), msg)
 }

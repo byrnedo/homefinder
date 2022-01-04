@@ -9,6 +9,7 @@ import (
 
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/xcss"
 	"golang.org/x/net/html"
 )
 
@@ -64,18 +65,18 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 			a := css.Query(n, css.MustCompile("a"))
 
 			listing := agents.Listing{
-				Link:  "https://www.maklarhuset.se" + agents.FindAttr(a, "href"),
-				Image: agents.FindAttr(dataObj, "data-object-image"),
+				Link:  "https://www.maklarhuset.se" + xcss.FindAttr(a, "href"),
+				Image: xcss.FindAttr(dataObj, "data-object-image"),
 			}
 
-			title := agents.FindAttr(dataObj, "data-object-address") + " " + agents.FindAttr(dataObj, "data-object-city") + "(" + agents.FindAttr(dataObj, "data-object-id") + ")"
+			title := xcss.FindAttr(dataObj, "data-object-address") + " " + xcss.FindAttr(dataObj, "data-object-city") + "(" + xcss.FindAttr(dataObj, "data-object-id") + ")"
 
 			listing.Name = title
 
 			var facts []string
 			for _, f := range css.QueryAll(n, css.MustCompile("figcaption>div.uk-h3>span")) {
 
-				raw := agents.CollectText(f)
+				raw := xcss.CollectText(f)
 				raw = strings.ReplaceAll(raw, "\n", "")
 				raw = strings.TrimSpace(raw)
 				raw = compressSpace.ReplaceAllString(raw, " ")

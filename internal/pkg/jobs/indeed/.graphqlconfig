@@ -1,0 +1,16 @@
+{
+  "name": "Untitled GraphQL Schema",
+  "schemaPath": "schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "Default GraphQL Endpoint": {
+        "url": "https://apis.indeed.com/graphql?co=SE",
+        "headers": {
+          "user-agent": "JS GraphQL",
+          "indeed-api-key": "9e8a2fd82bf5e73386b6c07f12a8a80d422a3b1b9730981cff5f312751ae0554"
+        },
+        "introspect": true
+      }
+    }
+  }
+}

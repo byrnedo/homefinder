@@ -8,6 +8,7 @@ import (
 
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/xcss"
 	"golang.org/x/net/html"
 )
 
@@ -44,17 +45,17 @@ func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 	}
 	nodes := css.QueryAll(n, css.MustCompile("body div.search__results div.grid__item"))
 	if len(nodes) == 0 {
-		return nil, agents.NotFoundErr{}
+		return nil, xcss.NotFoundErr{}
 	}
 	for _, n = range nodes {
 
 		a := css.Query(n, css.MustCompile("a"))
 		img := css.Query(n, css.MustCompile("div.search-hit__image"))
 		listing := agents.Listing{
-			Upcoming: agents.CollectText(css.Query(n, css.MustCompile("div.oc-badge"))) == "I startblocken",
-			Link:     "https://www.svenskfast.se" + agents.FindAttr(a, "href"),
-			Image:    agents.FindAttr(img, "data-src"),
-			Name:     agents.CleanText(agents.CollectText(css.Query(n, css.MustCompile("div.search-hit__address")))),
+			Upcoming: xcss.CollectText(css.Query(n, css.MustCompile("div.oc-badge"))) == "I startblocken",
+			Link:     "https://www.svenskfast.se" + xcss.FindAttr(a, "href"),
+			Image:    xcss.FindAttr(img, "data-src"),
+			Name:     xcss.CleanText(xcss.CollectText(css.Query(n, css.MustCompile("div.search-hit__address")))),
 		}
 
 		var facts []string
@@ -62,7 +63,7 @@ func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 
 			i := css.Query(f, css.MustCompile("i"))
 			if i != nil {
-				class := agents.FindAttr(i, "class")
+				class := xcss.FindAttr(i, "class")
 				classes := strings.Fields(class)
 				for _, c := range classes {
 					if strings.HasPrefix(c, "icon__") {
@@ -85,7 +86,7 @@ func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 				}
 			}
 
-			raw := agents.CleanText(agents.CollectText(f))
+			raw := xcss.CleanText(xcss.CollectText(f))
 
 			if strings.HasSuffix(raw, "kvm") {
 				sqmStr := strings.TrimSpace(strings.TrimSuffix(raw, "kvm"))

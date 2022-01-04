@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -17,22 +16,51 @@ type HistoryRepo interface {
 	SaveHistory(ctx context.Context, keys map[string]Void) error
 }
 
-type S3HistoryRepo struct {
+type S3HomesHistoryRepo struct {
 	s3c    *s3.Client
 	bucket string
 }
 
-func NewS3HistoryRepo(s3c *s3.Client, bucket string) S3HistoryRepo {
-	return S3HistoryRepo{
+func NewS3HomesHistoryRepo(s3c *s3.Client, bucket string) S3HomesHistoryRepo {
+	return S3HomesHistoryRepo{
 		s3c:    s3c,
 		bucket: bucket,
 	}
 }
 
-func (s S3HistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
-	obj, err := s.s3c.GetObject(ctx, &s3.GetObjectInput{
-		Bucket: &s.bucket,
-		Key:    aws.String("listings"),
+func (s S3HomesHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
+	return get(ctx, s.s3c, s.bucket, "listings")
+}
+
+func (s S3HomesHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
+	return save(ctx, s.s3c, s.bucket, "listings", keys)
+}
+
+type S3JobsHistoryRepo struct {
+	s3c    *s3.Client
+	bucket string
+}
+
+func NewS3JobsHistoryRepo(s3c *s3.Client, bucket string) S3JobsHistoryRepo {
+	return S3JobsHistoryRepo{
+		s3c:    s3c,
+		bucket: bucket,
+	}
+}
+
+func (s S3JobsHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
+	return get(ctx, s.s3c, s.bucket, "joblistings")
+}
+
+func (s S3JobsHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
+	return save(ctx, s.s3c, s.bucket, "joblistings", keys)
+}
+
+func get(ctx context.Context, s3c *s3.Client, bucket, filename string) (map[string]Void, error) {
+
+	obj, err := s3c.GetObject(ctx, &s3.GetObjectInput{
+		Bucket: &bucket,
+		Key:    aws.String(filename),
 	})
 	if err != nil {
 		return nil, err
@@ -49,7 +77,7 @@ func (s S3HistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) 
 	return m, nil
 }
 
-func (s S3HistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
+func save(ctx context.Context, s3c *s3.Client, bucket, filename string, keys map[string]Void) error {
 
 	writer := &bytes.Buffer{}
 
@@ -60,10 +88,9 @@ func (s S3HistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) er
 		}
 	}
 
-	log.Println("saving to s3:")
-	_, err := s.s3c.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: &s.bucket,
-		Key:    aws.String("listings"),
+	_, err := s3c.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: &bucket,
+		Key:    aws.String(filename),
 		Body:   writer,
 	})
 	return err

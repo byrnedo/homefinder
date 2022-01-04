@@ -23,8 +23,15 @@ func main() {
 
 		s3c := s3.NewFromConfig(cfg)
 
-		historyRepo := repos.NewS3HistoryRepo(s3c, bucket)
+		homeHistoryRepo := repos.NewS3HomesHistoryRepo(s3c, bucket)
 
-		app.Run(ctx, historyRepo)
+		if err := app.RunHousefinder(ctx, homeHistoryRepo); err != nil {
+			log.Println("ERROR: " + err.Error())
+		}
+
+		jobsHistoryRepo := repos.NewS3JobsHistoryRepo(s3c, bucket)
+		if err := app.RunJobfinder(ctx, jobsHistoryRepo); err != nil {
+			log.Println("ERROR: " + err.Error())
+		}
 	})
 }

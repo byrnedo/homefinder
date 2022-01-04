@@ -7,6 +7,7 @@ require github.com/andybalholm/cascadia v1.3.1
 require golang.org/x/net v0.0.0-20211209124913-491a49abca63
 
 require (
+	github.com/Khan/genqlient v0.3.0
 	github.com/aws/aws-lambda-go v1.27.1
 	github.com/aws/aws-sdk-go-v2 v1.11.2
 	github.com/aws/aws-sdk-go-v2/config v1.11.0
@@ -29,4 +30,5 @@ require (
 	github.com/aws/smithy-go v1.9.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/vektah/gqlparser/v2 v2.1.0 // indirect
 )

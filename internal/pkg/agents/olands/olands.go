@@ -9,6 +9,7 @@ import (
 
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/xcss"
 	"golang.org/x/net/html"
 )
 
@@ -43,24 +44,24 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 	}
 	nodes := css.QueryAll(n, css.MustCompile("div.filteritem"))
 	if len(nodes) == 0 {
-		return nil, agents.NotFoundErr{}
+		return nil, xcss.NotFoundErr{}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
 	for _, n = range nodes {
 		a := css.Query(n, css.MustCompile("a"))
 		img := css.Query(n, css.MustCompile("source"))
 		listing := agents.Listing{
-			Link:  "https://olandsmaklaren.se" + agents.FindAttr(a, "href"),
-			Image: agents.FindAttr(img, "srcset"),
+			Link:  "https://olandsmaklaren.se" + xcss.FindAttr(a, "href"),
+			Image: xcss.FindAttr(img, "srcset"),
 		}
 
-		title := agents.CollectText(css.Query(n, css.MustCompile("h3")))
-		listing.Name = title + " " + agents.FindAttr(a, "href")
+		title := xcss.CollectText(css.Query(n, css.MustCompile("h3")))
+		listing.Name = title + " " + xcss.FindAttr(a, "href")
 
 		var facts []string
 		for _, f := range css.QueryAll(n, css.MustCompile("div.uk-tile>ul>li")) {
 
-			raw := agents.CollectText(f)
+			raw := xcss.CollectText(f)
 			raw = strings.ReplaceAll(raw, "\n", "")
 			raw = strings.TrimSpace(raw)
 			raw = compressSpace.ReplaceAllString(raw, " ")
