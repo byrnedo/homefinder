@@ -26,7 +26,6 @@ Resources:
         Variables:
           BUCKET: byrnedo-homefinder
           SLACK_WEBHOOK_URL: $SLACK_WEBHOOK_URL
-          FN_NAME: !Sub '/aws/lambda/${function}'
       Tracing: Active
   CronEvent: #logical name of the resource
     Type: AWS::Events::Rule

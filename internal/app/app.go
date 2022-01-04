@@ -145,7 +145,7 @@ func RunJobfinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 
 		for _, listing := range listings {
 
-			curListings[c.Name()+":"+listing.Name] = repos.Void{}
+			curListings[c.Name()+":"+listing.ID] = repos.Void{}
 
 			if _, ok := prevListings[c.Name()+":"+listing.ID]; !ok {
 				// new listings
@@ -176,7 +176,7 @@ func RunJobfinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 					},
 					{
 						Type: slack.MarkdownType,
-						Text: dashIfEmpty(facts),
+						Text: dashIfEmpty(l.Company),
 					},
 					{
 						Type: slack.MarkdownType,
@@ -188,7 +188,7 @@ func RunJobfinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 					},
 					{
 						Type: slack.MarkdownType,
-						Text: dashIfEmpty(string(l.Type)),
+						Text: dashIfEmpty(facts),
 					},
 				},
 			})

@@ -8,5 +8,12 @@ import (
 )
 
 func main() {
-	app.Run(context.Background(), repos.EmptyHistoryRepo{})
+	err := app.RunHousefinder(context.Background(), repos.EmptyHistoryRepo{})
+	if err != nil {
+		panic(err)
+	}
+	err = app.RunJobfinder(context.Background(), repos.EmptyHistoryRepo{})
+	if err != nil {
+		panic(err)
+	}
 }
