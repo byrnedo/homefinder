@@ -10,4 +10,4 @@ run-offline:
 test-lambda:
 	cd ./scripts && ./3-invoke.sh
 logs:
-	aws logs tail /aws/lambda/homefinder-function-nENJWb1mYMzj --region us-east-1
+	aws logs tail /aws/lambda/$(shell aws cloudformation describe-stack-resources  --region us-east-1 --stack-name homefinder  --logical-resource-id function |jq '.StackResources[0].PhysicalResourceId' -r) --region us-east-1
