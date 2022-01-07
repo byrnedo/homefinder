@@ -99,16 +99,25 @@ func get(ctx context.Context, s3c *s3.Client, bucket, filename string) (map[stri
 
 func save(ctx context.Context, s3c *s3.Client, bucket, filename string, keys map[string]Void) error {
 
+	orig, err := get(ctx, s3c, bucket, filename)
+	if err != nil {
+		return err
+	}
+
 	writer := &bytes.Buffer{}
 
-	for k := range keys {
+	for k, v := range keys {
+		orig[k] = v
+	}
+
+	for k := range orig {
 		_, err := writer.WriteString(k + "\n")
 		if err != nil {
 			return err
 		}
 	}
 
-	_, err := s3c.PutObject(ctx, &s3.PutObjectInput{
+	_, err = s3c.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: &bucket,
 		Key:    aws.String(filename),
 		Body:   writer,
