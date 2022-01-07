@@ -3,9 +3,11 @@ package erikolsson
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
+	"github.com/byrnedo/homefinder/internal/pkg/xcss"
 )
 
 type Crawler struct {
@@ -22,7 +24,7 @@ type property struct {
 	City                  string      `json:"city"`
 	AreaName              string      `json:"areaName"`
 	Address               string      `json:"address"`
-	Price                 interface{} `json:"price"`
+	Price                 string      `json:"price"`
 	Rooms                 string      `json:"rooms"`
 	ShowPuff              bool        `json:"showPuff"`
 	PuffText              string      `json:"puffText"`
@@ -54,8 +56,14 @@ type response struct {
 	ShouldRenderOneThirdInThreeGrid bool       `json:"shouldRenderOneThirdInThreeGrid"`
 }
 
-func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
-	res, err := http.Get("https://www.erikolsson.se/api/search/?areaids=117205-Kalmar,Kalmar|117224-Färjestaden,Mörbylånga&propertytype=villa,tomt-mark,radhus,parhus,kedjehus&internalOnly=true")
+func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
+
+	address := "https://www.erikolsson.se/api/search/?areaids=117205-Kalmar,Kalmar|117224-Färjestaden,Mörbylånga&propertytype=villa,tomt-mark,radhus,parhus,kedjehus&internalOnly=true"
+	if target == agents.TargetBjelin {
+		address = "https://www.erikolsson.se/api/search/?areaids=201-H%C3%A4rryda%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C268-Partille%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C208-Kungsbacka%2C%20Hallands%20l%C3%A4n%7C72-Lerum%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C259-M%C3%B6lndal%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&propertytype=villa&minarea=75&maxprice=5000000"
+	}
+
+	res, err := http.Get(address)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +74,7 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 	}
 
 	for _, item := range result.Properties {
-		listings = append(listings, agents.Listing{
+		l := agents.Listing{
 			Name:         strings.Join([]string{item.Address, item.AreaName + "(" + item.VitecObjectId + ")"}, ","),
 			Link:         "https://www.erikolsson.se" + item.Url,
 			Type:         c.parseType(item),
@@ -74,7 +82,9 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 			Upcoming:     strings.EqualFold(item.PuffText, "kommer snart"),
 			Facts:        strings.Split(strings.TrimSuffix(item.Rooms, "."), ","),
 			SquareMetres: 0,
-		})
+		}
+		l.Price, _ = strconv.Atoi(strings.TrimSuffix(xcss.RemoveSpace(item.Price), "kr"))
+		listings = append(listings, l)
 	}
 	return
 }

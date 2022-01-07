@@ -3,6 +3,7 @@ package xcss
 import (
 	"regexp"
 	"strings"
+	"unicode"
 
 	"golang.org/x/net/html"
 )
@@ -27,6 +28,15 @@ func CleanText(raw string) string {
 	raw = strings.TrimSpace(raw)
 	raw = compressSpace.ReplaceAllString(raw, " ")
 	return raw
+}
+func RemoveSpace(s string) string {
+	rr := make([]rune, 0, len(s))
+	for _, r := range s {
+		if !unicode.IsSpace(r) {
+			rr = append(rr, r)
+		}
+	}
+	return string(rr)
 }
 
 func CollectText(n *html.Node) (c string) {

@@ -2,6 +2,7 @@ package maklarhuset
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -14,23 +15,40 @@ import (
 )
 
 type Crawler struct {
-	fstanBody  string
-	kalmarBody string
+	bodies    []string
+	addresses []string
 }
 
-func (o *Crawler) fetch() error {
-	res, err := http.DefaultClient.Get("https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/farjestaden-kommun?undefined")
-	if err != nil {
-		return nil
+func (o *Crawler) fetch(target agents.Target) error {
+
+	o.addresses = []string{
+		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/farjestaden-kommun?undefined",
+		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/kalmar-kommun?undefined",
 	}
-	b, _ := ioutil.ReadAll(res.Body)
-	o.fstanBody = string(b)
-	res, err = http.DefaultClient.Get("https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/kalmar-kommun?undefined")
-	if err != nil {
-		return nil
+	if target == agents.TargetBjelin {
+		o.addresses = []string{
+			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/lerum-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
+			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/partille-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22&livingareafrom=85&currency=1",
+
+			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/harryda-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
+
+			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/molndal-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes=%7B%22objecttypeids%22:%22%5B1%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B7%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B21%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B10%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B8%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B9%5D%22%7D&livingareafrom=85&currency=1",
+
+			"https://www.maklarhuset.se/bostad/sverige/hallands-lan/kungsbacka-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
+		}
 	}
-	b, _ = ioutil.ReadAll(res.Body)
-	o.kalmarBody = string(b)
+	for _, u := range o.addresses {
+
+		res, err := http.DefaultClient.Get(u)
+		if err != nil {
+			return nil
+		}
+		func() {
+			defer res.Body.Close()
+			b, _ := ioutil.ReadAll(res.Body)
+			o.bodies = append(o.bodies, string(b))
+		}()
+	}
 	return nil
 }
 
@@ -38,14 +56,13 @@ func (o Crawler) Name() string {
 	return "Mäklarhuset"
 }
 
-func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
-	if o.fstanBody == "" {
-		if err := o.fetch(); err != nil {
-			return nil, err
-		}
+func (o *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
+	if err := o.fetch(target); err != nil {
+		return nil, err
 	}
 
-	for _, body := range []string{o.fstanBody, o.kalmarBody} {
+	for i, body := range o.bodies {
+		log.Printf("iter %d, url: %s\n", i, o.addresses[i])
 
 		n, err := html.Parse(strings.NewReader(body))
 		if err != nil {
@@ -56,6 +73,7 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 
 		var compressSpace = regexp.MustCompile(`\s+`)
 
+		var urlListings []agents.Listing
 		for _, n = range nodes {
 			n = n.Parent
 			dataObj := css.Query(n.Parent, css.MustCompile("div[data-object-id]"))
@@ -111,8 +129,15 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 				continue
 			}
 			listing.Facts = facts
-			listings = append(listings, listing)
+
+			if len(facts) > 0 && strings.HasSuffix(facts[0], " kr") {
+				priceStr := xcss.RemoveSpace(strings.TrimSuffix(facts[0], " kr"))
+				listing.Price, _ = strconv.Atoi(priceStr)
+			}
+			urlListings = append(urlListings, listing)
 		}
+		listings = append(listings, urlListings...)
+		log.Println(len(urlListings), "listings found")
 	}
 
 	return

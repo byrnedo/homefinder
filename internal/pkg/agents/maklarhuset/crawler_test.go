@@ -3,23 +3,19 @@ package maklarhuset
 import (
 	_ "embed"
 	"testing"
+
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
 )
 
-//go:embed index-fstan.html
-var testFstanBody string
-
-//go:embed index-kalmar.html
-var testKalmarBody string
-
 func TestCrawler(t *testing.T) {
-	p := Crawler{fstanBody: testFstanBody, kalmarBody: testKalmarBody}
+	p := Crawler{}
 
-	l, err := p.GetForSale()
+	l, err := p.GetForSale(agents.TargetBjelin)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(l) != 3 {
+	if len(l) != 13 {
 		t.Fatalf("wrong number of listings: %d", len(l))
 	}
 	t.Log(l)

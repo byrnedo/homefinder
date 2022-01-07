@@ -21,9 +21,17 @@ type Listing struct {
 	Upcoming     bool
 	Facts        []string
 	SquareMetres int
+	Price        int
 }
 
 type Crawler interface {
 	Name() string
-	GetForSale() ([]Listing, error)
+	GetForSale(target Target) ([]Listing, error)
 }
+
+type Target string
+
+const (
+	TargetSjobyrne Target = "sjobyrne"
+	TargetBjelin   Target = "bjelin"
+)

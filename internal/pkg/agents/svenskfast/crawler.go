@@ -20,9 +20,14 @@ func (p Crawler) Name() string {
 	return "Svenskfastihetsförmedling"
 }
 
-func (p *Crawler) fetch() error {
+func (p *Crawler) fetch(target agents.Target) error {
 
-	res, err := http.DefaultClient.Get("https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=kalmar/morbylanga/farjestaden")
+	u := "https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=kalmar/morbylanga/farjestaden"
+	if target == agents.TargetBjelin {
+		u = "https://www.svenskfast.se/hus/vastra-gotaland/lerum/?t=Radhus&l=vastra-gotaland/partille,vastra-gotaland/harryda,vastra-gotaland/molndal,halland/kungsbacka&maxp=4500000&minla=80"
+	}
+
+	res, err := http.DefaultClient.Get(u)
 	if err != nil {
 		return nil
 	}
@@ -32,9 +37,10 @@ func (p *Crawler) fetch() error {
 
 }
 
-func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
+func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err error) {
+
 	if p.body == "" {
-		if err := p.fetch(); err != nil {
+		if err := p.fetch(target); err != nil {
 			return nil, err
 		}
 	}
