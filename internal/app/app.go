@@ -10,6 +10,7 @@ import (
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/erikolsson"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/fastighetsbyran"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/lanfast"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/maklarhuset"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/olands"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/pontuz"
@@ -38,6 +39,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 		&svenskfast.Crawler{},
 		&maklarhuset.Crawler{},
 		&erikolsson.Crawler{},
+		&lanfast.Crawler{},
 	}
 
 	prevListings, err := historyRepo.GetHistory(ctx)

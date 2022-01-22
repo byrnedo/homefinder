@@ -34,9 +34,6 @@ func (p *Crawler) fetch() error {
 }
 
 func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err error) {
-	if target == agents.TargetBjelin {
-		return nil, nil
-	}
 	if p.body == "" {
 		if err := p.fetch(); err != nil {
 			return nil, err

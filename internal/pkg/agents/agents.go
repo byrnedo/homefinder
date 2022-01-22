@@ -33,5 +33,4 @@ type Target string
 
 const (
 	TargetSjobyrne Target = "sjobyrne"
-	TargetBjelin   Target = "bjelin"
 )

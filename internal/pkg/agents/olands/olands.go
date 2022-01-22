@@ -32,10 +32,6 @@ func (o Crawler) Name() string {
 }
 
 func (o *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
-	if target == agents.TargetBjelin {
-		return nil, nil
-	}
-
 	if o.body == "" {
 		if err := o.fetch(); err != nil {
 			return nil, err

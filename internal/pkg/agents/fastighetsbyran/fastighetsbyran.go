@@ -61,9 +61,6 @@ type response struct {
 }
 
 func (f *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
-	if target == agents.TargetBjelin {
-		return nil, nil
-	}
 	if f.body == "" {
 		if err := f.fetch(); err != nil {
 			return nil, err

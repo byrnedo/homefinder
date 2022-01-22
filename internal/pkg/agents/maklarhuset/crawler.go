@@ -25,18 +25,6 @@ func (o *Crawler) fetch(target agents.Target) error {
 		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/farjestaden-kommun?undefined",
 		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/kalmar-kommun?undefined",
 	}
-	if target == agents.TargetBjelin {
-		o.addresses = []string{
-			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/lerum-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
-			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/partille-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22&livingareafrom=85&currency=1",
-
-			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/harryda-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
-
-			"https://www.maklarhuset.se/bostad/sverige/vastra-gotalands-lan/molndal-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes=%7B%22objecttypeids%22:%22%5B1%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B7%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B21%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B10%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B8%5D%22%7D&marketingtypes=%7B%22objecttypeids%22:%22%5B9%5D%22%7D&livingareafrom=85&currency=1",
-
-			"https://www.maklarhuset.se/bostad/sverige/hallands-lan/kungsbacka-kommun?page=0&view=list&sortby=searchresultpercentage-desc&marketingtypes={%22objecttypeids%22:%22[1]%22}&marketingtypes={%22objecttypeids%22:%22[7]%22}&marketingtypes={%22objecttypeids%22:%22[21]%22}&marketingtypes={%22objecttypeids%22:%22[10]%22}&marketingtypes={%22objecttypeids%22:%22[8]%22}&marketingtypes={%22objecttypeids%22:%22[9]%22}&livingareafrom=85&currency=1",
-		}
-	}
 	for _, u := range o.addresses {
 
 		res, err := http.DefaultClient.Get(u)

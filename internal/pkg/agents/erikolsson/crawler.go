@@ -59,9 +59,6 @@ type response struct {
 func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
 
 	address := "https://www.erikolsson.se/api/search/?areaids=117205-Kalmar,Kalmar|117224-Färjestaden,Mörbylånga&propertytype=villa,tomt-mark,radhus,parhus,kedjehus&internalOnly=true"
-	if target == agents.TargetBjelin {
-		address = "https://www.erikolsson.se/api/search/?areaids=201-H%C3%A4rryda%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C268-Partille%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C208-Kungsbacka%2C%20Hallands%20l%C3%A4n%7C72-Lerum%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n%7C259-M%C3%B6lndal%2C%20V%C3%A4stra%20G%C3%B6talands%20l%C3%A4n&propertytype=villa&minarea=75&maxprice=5000000"
-	}
 
 	res, err := http.Get(address)
 	if err != nil {

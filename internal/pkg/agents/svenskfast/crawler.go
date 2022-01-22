@@ -23,9 +23,6 @@ func (p Crawler) Name() string {
 func (p *Crawler) fetch(target agents.Target) error {
 
 	u := "https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=kalmar/morbylanga/farjestaden"
-	if target == agents.TargetBjelin {
-		u = "https://www.svenskfast.se/hus/vastra-gotaland/lerum/?t=Radhus&l=vastra-gotaland/partille,vastra-gotaland/harryda,vastra-gotaland/molndal,halland/kungsbacka&maxp=4500000&minla=80"
-	}
 
 	res, err := http.DefaultClient.Get(u)
 	if err != nil {
