@@ -80,57 +80,6 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	return nil
 }
 
-func RunHousefinderBjelin(ctx context.Context, historyRepo repos.HistoryRepo) error {
-	crawlers := []agents.Crawler{
-		&fastighetsbyran.Crawler{},
-		&svenskfast.Crawler{},
-		&maklarhuset.Crawler{},
-		&erikolsson.Crawler{},
-	}
-
-	prevListings, err := historyRepo.GetHistory(ctx)
-	if err != nil {
-		return fmt.Errorf("BJELIN: failed to load from disk: %s", err)
-	}
-
-	curListings := map[string]repos.Void{}
-
-	var newListings []agents.Listing
-	for _, c := range crawlers {
-		log.Println("BJELIN: checking " + c.Name() + "...")
-		listings, err := c.GetForSale(agents.TargetBjelin)
-		if err != nil {
-			return err
-		}
-		log.Printf("BJELIN: found %d listings for %s\n", len(listings), c.Name())
-
-		for _, listing := range listings {
-			if listing.Price != 0 && listing.Price > 4_500_000 {
-				continue
-			}
-
-			curListings[c.Name()+":"+listing.Name] = repos.Void{}
-
-			if _, ok := prevListings[c.Name()+":"+listing.Name]; !ok {
-				// new listings
-				newListings = append(newListings, listing)
-				//
-			}
-		}
-	}
-
-	log.Printf("BJELIN: found %d new listings\n", len(newListings))
-
-	if err := sendBlocksToSlack(ctx, newListings, "#bjelin"); err != nil {
-		return err
-	}
-
-	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
-		return err
-	}
-	return nil
-}
-
 func RunJobfinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	crawlers := []jobs.Crawler{
 		&indeed.Crawler{},
@@ -236,7 +185,7 @@ func sendBlocksToSlack(ctx context.Context, newListings []agents.Listing, channe
 		}
 	}
 	if blocks != nil {
-		if err := postToSlack(ctx, blocks, nil, "#bjelin"); err != nil {
+		if err := postToSlack(ctx, blocks, nil, channel); err != nil {
 			return err
 		}
 	}

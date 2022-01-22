@@ -21,21 +21,6 @@ type S3HomesBjelinHistoryRepo struct {
 	bucket string
 }
 
-func NewS3HomesBjelinHistoryRepo(s3c *s3.Client, bucket string) S3HomesBjelinHistoryRepo {
-	return S3HomesBjelinHistoryRepo{
-		s3c:    s3c,
-		bucket: bucket,
-	}
-}
-
-func (s S3HomesBjelinHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
-	return get(ctx, s.s3c, s.bucket, "bjelin.listings")
-}
-
-func (s S3HomesBjelinHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
-	return save(ctx, s.s3c, s.bucket, "bjelin.listings", keys)
-}
-
 type S3HomesHistoryRepo struct {
 	s3c    *s3.Client
 	bucket string

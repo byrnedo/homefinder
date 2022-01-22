@@ -83,6 +83,9 @@ func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, er
 			Facts:        strings.Split(strings.TrimSuffix(item.Rooms, "."), ","),
 			SquareMetres: 0,
 		}
+		if strings.HasPrefix(item.Url, "http") {
+			l.Link = item.Url
+		}
 		l.Price, _ = strconv.Atoi(strings.TrimSuffix(xcss.RemoveSpace(item.Price), "kr"))
 		listings = append(listings, l)
 	}
