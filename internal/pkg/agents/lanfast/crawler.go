@@ -75,9 +75,9 @@ func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, er
 			Name:         strings.Join([]string{item.StreetAddress, item.City}, ","),
 			Link:         "https://www.lansfast.se" + item.Url,
 			Type:         c.parseType(item),
-			Image:        "https://www.lansfast.se" + item.HeaderImage,
+			Image:        "https://www.lansfast.se/Content" + item.HeaderImage,
 			Upcoming:     strings.EqualFold(item.Status, "Kommande"),
-			Facts:        []string{item.NumberOfRooms + "rum", fmt.Sprintf("%fkvm", item.PlotSize), item.LivingSpace + "kvm"},
+			Facts:        []string{item.NumberOfRooms + "rum", fmt.Sprintf("%0fkvm", item.PlotSize), item.LivingSpace + "kvm"},
 			SquareMetres: 0,
 		}
 		if strings.HasPrefix(item.Url, "http") {
@@ -95,8 +95,12 @@ func (c Crawler) parseType(p estate) agents.ListingType {
 		return agents.ListingTypeHouse
 	case "tomt":
 		return agents.ListingTypePlot
-	case "båstadsrätt":
+	case "bostadsrätt":
 		return agents.ListingTypeApartment
+	case "fritidshus":
+		return agents.ListingTypeSummerHouse
+	case "nyproduktion":
+		return agents.ListingTypeHouse
 	default:
 		return agents.ListingTypeUnknown
 	}
