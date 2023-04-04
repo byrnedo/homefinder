@@ -23,7 +23,6 @@ func (o *Crawler) fetch(target agents.Target) error {
 
 	o.addresses = []string{
 		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/farjestaden-kommun?undefined",
-		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/kalmar-kommun?undefined",
 	}
 	for _, u := range o.addresses {
 

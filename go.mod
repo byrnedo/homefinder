@@ -1,6 +1,6 @@
 module github.com/byrnedo/homefinder
 
-go 1.17
+go 1.20
 
 require github.com/andybalholm/cascadia v1.3.1
 

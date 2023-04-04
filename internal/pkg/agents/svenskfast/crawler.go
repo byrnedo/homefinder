@@ -22,7 +22,7 @@ func (p Crawler) Name() string {
 
 func (p *Crawler) fetch(target agents.Target) error {
 
-	u := "https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=kalmar/morbylanga/farjestaden"
+	u := "https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=morbylanga/farjestaden"
 
 	res, err := http.DefaultClient.Get(u)
 	if err != nil {

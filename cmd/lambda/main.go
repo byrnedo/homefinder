@@ -28,10 +28,5 @@ func main() {
 		if err := app.RunHousefinder(ctx, homeHistoryRepo); err != nil {
 			log.Println("ERROR: " + err.Error())
 		}
-
-		jobsHistoryRepo := repos.NewS3JobsHistoryRepo(s3c, bucket)
-		if err := app.RunJobfinder(ctx, jobsHistoryRepo); err != nil {
-			log.Println("ERROR: " + err.Error())
-		}
 	})
 }

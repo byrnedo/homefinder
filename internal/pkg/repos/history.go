@@ -46,21 +46,6 @@ type S3JobsHistoryRepo struct {
 	bucket string
 }
 
-func NewS3JobsHistoryRepo(s3c *s3.Client, bucket string) S3JobsHistoryRepo {
-	return S3JobsHistoryRepo{
-		s3c:    s3c,
-		bucket: bucket,
-	}
-}
-
-func (s S3JobsHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
-	return get(ctx, s.s3c, s.bucket, "joblistings")
-}
-
-func (s S3JobsHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
-	return save(ctx, s.s3c, s.bucket, "joblistings", keys)
-}
-
 func get(ctx context.Context, s3c *s3.Client, bucket, filename string) (map[string]Void, error) {
 
 	obj, err := s3c.GetObject(ctx, &s3.GetObjectInput{

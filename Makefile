@@ -9,6 +9,8 @@ run-offline:
 
 test-lambda:
 	cd ./scripts && ./3-invoke.sh
+name:
+	aws cloudformation describe-stack-resources  --region us-east-1 --stack-name homefinder  --logical-resource-id function |jq '.StackResources[0].PhysicalResourceId' -r
 logs:
 	name=$$(aws cloudformation describe-stack-resources  --region us-east-1 --stack-name homefinder  --logical-resource-id function |jq '.StackResources[0].PhysicalResourceId' -r) && \
 	aws logs tail /aws/lambda/$$name --region us-east-1

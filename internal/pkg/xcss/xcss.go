@@ -53,6 +53,9 @@ func CollectText(n *html.Node) (c string) {
 }
 
 func FindAttr(n *html.Node, name string) string {
+	if n == nil {
+		return ""
+	}
 	for _, a := range n.Attr {
 		if a.Key == name {
 			return a.Val

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eo pipefail
 
-(cd .. && GOOS=linux go build -o ./scripts/build/lambda cmd/lambda/main.go)
+(cd .. && GOOS=linux GOARCH=amd64 go build -o ./scripts/build/lambda cmd/lambda/main.go)
 
 ./1-template.sh
 

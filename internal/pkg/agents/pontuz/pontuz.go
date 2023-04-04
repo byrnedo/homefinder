@@ -21,6 +21,60 @@ func (p Crawler) Name() string {
 	return "Pontuz Löfgren"
 }
 
+var blacklistTitles = []string{
+	"KALMARSUNDSPARKEN",
+	"VARVSHOLMEN",
+	"SMEDBY",
+	"OXHAGEN",
+	"BERGA",
+	"LINDÖ",
+	"SKÄLBY",
+	"BJÖRKENÄS",
+	"BERGAVIK",
+	"KVARNHOLMEN",
+	"FÖRLÖSA",
+	"LINNÉSTADEN",
+	"LÄCKEBY",
+	"NORRGÅRD",
+	"DJURÄNGEN",
+	"MÖRBYLÅNGA",
+	"MALMEN",
+	"KLÄCKEBERGA",
+	"SANDÅS",
+	"TREKANTEN",
+	"JOHANNESBORG",
+	"FREDRIKSSKANS",
+	"CENTRALT",
+	"SÖDERCENTRUM",
+	"RINKABYHOLM",
+	"STENSÖ",
+	"TEGELVIKEN",
+	"VIMPELTORPET",
+	"NORRLIDEN",
+	"LINDSDAL",
+	"GETINGEN",
+	"LINDBY TALL",
+	"STRANDSKOGEN",
+	"BREMERLYCKAN",
+	"REVSUDDEN",
+	"GÅRDBY",
+	"LJUSSTADEN",
+	"SÖDRA OMRÅDET",
+	"FUNKABO",
+	"LÅNGRÄLLA",
+	"ESPLANADEN",
+	"KVARNVIKEN",
+	"LJUNGBYHOLM",
+	"BREDINGE STRAND",
+	"HOSSMO",
+	"TIMMERNABBEN",
+	"ÄNGÖ",
+	"KRISTIANOPEL",
+	"GAMLA STAN",
+	"KÅREHAMN",
+	"PARADISET",
+}
+
 func (p *Crawler) fetch() error {
 
 	res, err := http.DefaultClient.Get("https://www.pontuzlofgren.se/till-salu")
@@ -49,7 +103,15 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 		return nil, xcss.NotFoundErr{"body>div.wrapper>div.ol-wrapper.container>div.col"}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
+Nodes:
 	for _, n = range nodes {
+
+		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
+		for _, ignore := range blacklistTitles {
+			if strings.ToUpper(title) == ignore {
+				continue Nodes
+			}
+		}
 
 		var listingType agents.ListingType
 		if xcss.HasClass(n, "house") {
@@ -73,7 +135,6 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 			Type:     listingType,
 		}
 
-		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
 		sub := xcss.CollectText(css.Query(n, css.MustCompile("h4.oc-sub-title")))
 		listing.Name = strings.Join([]string{title, sub}, " ")
 
