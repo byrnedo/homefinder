@@ -48,6 +48,10 @@ func (o *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, e
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
 	for _, n = range nodes {
+		if xcss.HasClass(n, "CMNYPROD596TF9JK1PVBRKGH") {
+			continue
+		}
+
 		a := css.Query(n, css.MustCompile("a"))
 		img := css.Query(n, css.MustCompile("source"))
 		listing := agents.Listing{

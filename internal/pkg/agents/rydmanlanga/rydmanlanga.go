@@ -2,6 +2,7 @@ package rydmanlanga
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -59,6 +60,10 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 		}
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
+		if !strings.Contains(strings.ToLower(title), "mörbylånga") {
+			log.Println("skipping " + title)
+			continue
+		}
 		sub := xcss.CollectText(css.Query(n, css.MustCompile("h4.oc-sub-title")))
 		listing.Name = strings.Join([]string{title, sub}, " ")
 

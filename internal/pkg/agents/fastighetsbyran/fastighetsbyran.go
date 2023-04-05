@@ -21,7 +21,7 @@ func (f Crawler) Name() string {
 }
 
 func (f *Crawler) fetch() error {
-	req, _ := http.NewRequest("POST", "https://www.fastighetsbyran.com/HemsidanAPI/api/v1/soek/objekt/1/false/", strings.NewReader(`{"valdaMaeklarObjektTyper":[0,14,1,3,9999,4],"valdaNyckelord":[],"valdaLaen":[],"valdaKontor":[],"valdaKommuner":["373"],"valdaNaeromraaden":[4188],"valdaPostorter":[],"inkluderaNyproduktion":true,"inkluderaPaaGaang":true}`))
+	req, _ := http.NewRequest("POST", "https://www.fastighetsbyran.com/HemsidanAPI/api/v1/soek/objekt/1/false/", strings.NewReader(`{"valdaMaeklarObjektTyper":[0,14,1,3,9999,4],"valdaNyckelord":[],"valdaLaen":[],"valdaKontor":[],"valdaKommuner":[],"valdaNaeromraaden":[4188],"valdaPostorter":[],"inkluderaNyproduktion":true,"inkluderaPaaGaang":true}`))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	res, err := http.DefaultClient.Do(req)
