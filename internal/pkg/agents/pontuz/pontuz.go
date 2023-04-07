@@ -2,6 +2,7 @@ package pontuz
 
 import (
 	"io/ioutil"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -103,14 +104,22 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 		return nil, xcss.NotFoundErr{"body>div.wrapper>div.ol-wrapper.container>div.col"}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
-Nodes:
+
 	for _, n = range nodes {
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
-		for _, ignore := range blacklistTitles {
-			if strings.ToUpper(title) == ignore {
-				continue Nodes
+
+		hit := false
+		for _, term := range []string{"FÄRJESTADEN", "RUNSBÄCK"} {
+			if strings.Contains(strings.ToUpper(title), term) {
+				hit = true
+				break
 			}
+		}
+
+		if !hit {
+			log.Printf("ignoring %s", title)
+			continue
 		}
 
 		var listingType agents.ListingType
