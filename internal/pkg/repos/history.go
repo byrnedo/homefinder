@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -104,4 +105,52 @@ func (e EmptyHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, erro
 
 func (e EmptyHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
 	return nil
+}
+
+type FileHistoryRepo struct {
+	Name string
+}
+
+func (e FileHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
+	b, _ := os.ReadFile(e.Name)
+
+	m := map[string]Void{}
+	scanner := bufio.NewScanner(bytes.NewBuffer(b))
+	for scanner.Scan() {
+		text := scanner.Text()
+		m[text] = Void{}
+	}
+	return m, nil
+}
+
+func (e FileHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
+	orig, _ := e.GetHistory(ctx)
+
+	f, err := os.OpenFile(e.Name, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
+
+	_ = f.Truncate(0)
+	_, _ = f.Seek(0, 0)
+
+	if orig == nil {
+		orig = make(map[string]Void)
+	}
+
+	for k, v := range keys {
+		orig[k] = v
+	}
+
+	for k := range orig {
+		_, err := f.WriteString(k + "\n")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+
 }
