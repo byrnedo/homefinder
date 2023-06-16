@@ -25,10 +25,10 @@ type estate struct {
 	PriceMin                float64     `json:"priceMin"`
 	PriceMax                float64     `json:"priceMax"`
 	MonthlyCost             float64     `json:"monthlyCost"`
-	LivingSpace             string      `json:"livingSpace"`
+	LivingSpace             float64     `json:"livingSpace"`
 	LivingSpaceMax          float64     `json:"livingSpaceMax"`
 	LivingSpaceMin          float64     `json:"livingSpaceMin"`
-	OtherSpace              string      `json:"otherSpace"`
+	OtherSpace              float64     `json:"otherSpace"`
 	PlotSize                float64     `json:"plotSize"`
 	NumberOfRooms           string      `json:"numberOfRooms"`
 	NumberOfRoomsMax        float64     `json:"numberOfRoomsMax"`
@@ -58,7 +58,7 @@ type response struct {
 
 func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
 
-	address := "https://www.lansfast.se/umbraco/api/findestateapi/loadestates?municipality=Kalmar&areaIds=CMOMRADE4SBR9DBI7G5JTKOQ&areaNames=Färjestaden&estateType=Villa,Bostadsrätt,Fritidshus,Tomt,Nyproduktion&sortOrder=0"
+	address := "https://app-lansfast-api.azurewebsites.net/api/Estates/GetForFilter?municipality=M%C3%B6rbyl%C3%A5nga&estateType=Villa&sortOrder=0"
 
 	res, err := http.Get(address)
 	if err != nil {
@@ -77,7 +77,7 @@ func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, er
 			Type:         c.parseType(item),
 			Image:        "https://www.lansfast.se/Content" + item.HeaderImage,
 			Upcoming:     strings.EqualFold(item.Status, "Kommande"),
-			Facts:        []string{item.NumberOfRooms + "rum", fmt.Sprintf("%0fkvm", item.PlotSize), item.LivingSpace + "kvm"},
+			Facts:        []string{item.NumberOfRooms + "rum", fmt.Sprintf("%0fkvm", item.PlotSize), fmt.Sprintf("%0fkvm", item.LivingSpace)},
 			SquareMetres: 0,
 		}
 		if strings.HasPrefix(item.Url, "http") {

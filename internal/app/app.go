@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -47,12 +48,16 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 
 	curListings := map[string]repos.Void{}
 
+	var crawlerErrs error
+
 	var newListings []agents.Listing
 	for _, c := range crawlers {
 		log.Println("checking " + c.Name() + "...")
 		listings, err := c.GetForSale(agents.TargetSjobyrne)
 		if err != nil {
-			return err
+			crawlerErrs = errors.Join(crawlerErrs, fmt.Errorf("%s: %w", c.Name(), err))
+			log.Printf("ERROR (%s): %s", c.Name(), err)
+			continue
 		}
 		log.Printf("found %d listings for %s\n", len(listings), c.Name())
 
@@ -77,7 +82,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
 		return err
 	}
-	return nil
+	return crawlerErrs
 }
 
 func sendBlocksToSlack(ctx context.Context, newListings []agents.Listing, channel string) error {
