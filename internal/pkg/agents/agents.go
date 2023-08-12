@@ -11,6 +11,7 @@ const (
 	ListingTypeUnknown     ListingType = "unknown"
 	ListingTypePlot        ListingType = "plot"
 	ListingTypeApartment   ListingType = "apartment"
+	ListingTypeSharing     ListingType = "sharing"
 )
 
 type Listing struct {
