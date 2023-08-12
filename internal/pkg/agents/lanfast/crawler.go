@@ -30,7 +30,7 @@ type estate struct {
 	LivingSpaceMin          float64     `json:"livingSpaceMin"`
 	OtherSpace              float64     `json:"otherSpace"`
 	PlotSize                float64     `json:"plotSize"`
-	NumberOfRooms           string      `json:"numberOfRooms"`
+	NumberOfRooms           float64     `json:"numberOfRooms"`
 	NumberOfRoomsMax        float64     `json:"numberOfRoomsMax"`
 	NumberOfRoomsMin        float64     `json:"numberOfRoomsMin"`
 	IsProjectEstate         bool        `json:"isProjectEstate"`
@@ -75,9 +75,9 @@ func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, er
 			Name:         strings.Join([]string{item.StreetAddress, item.City}, ","),
 			Link:         "https://www.lansfast.se" + item.Url,
 			Type:         c.parseType(item),
-			Image:        "https://www.lansfast.se/Content" + item.HeaderImage,
+			Image:        item.HeaderImage,
 			Upcoming:     strings.EqualFold(item.Status, "Kommande"),
-			Facts:        []string{item.NumberOfRooms + "rum", fmt.Sprintf("%0fkvm", item.PlotSize), fmt.Sprintf("%0fkvm", item.LivingSpace)},
+			Facts:        []string{fmt.Sprintf("%grum", item.NumberOfRooms), fmt.Sprintf("%gkvm", item.PlotSize), fmt.Sprintf("%gkvm", item.LivingSpace)},
 			SquareMetres: 0,
 		}
 		if strings.HasPrefix(item.Url, "http") {
