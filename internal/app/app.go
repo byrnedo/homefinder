@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/daft"
 	"log"
 	"os"
 	"strings"
@@ -29,16 +30,22 @@ func dashIfEmpty(s string) string {
 	return s
 }
 
+type crawlerConf struct {
+	agents.Crawler
+	channel string
+}
+
 func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
-	crawlers := []agents.Crawler{
-		&pontuz.Crawler{},
-		&rydmanlanga.Crawler{},
-		&fastighetsbyran.Crawler{},
-		&olands.Crawler{},
-		&svenskfast.Crawler{},
-		&maklarhuset.Crawler{},
-		&erikolsson.Crawler{},
-		&lanfast.Crawler{},
+	crawlers := []crawlerConf{
+		{Crawler: &pontuz.Crawler{}, channel: "#oland"},
+		{Crawler: &rydmanlanga.Crawler{}, channel: "#oland"},
+		{Crawler: &fastighetsbyran.Crawler{}, channel: "#oland"},
+		{Crawler: &olands.Crawler{}, channel: "#oland"},
+		{Crawler: &svenskfast.Crawler{}, channel: "#oland"},
+		{Crawler: &maklarhuset.Crawler{}, channel: "#oland"},
+		{Crawler: &erikolsson.Crawler{}, channel: "#oland"},
+		{Crawler: &lanfast.Crawler{}, channel: "#oland"},
+		{Crawler: &daft.Crawler{}, channel: "#daft"},
 	}
 
 	prevListings, err := historyRepo.GetHistory(ctx)
@@ -50,7 +57,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 
 	var crawlerErrs error
 
-	var newListings []agents.Listing
+	newListings := map[string][]agents.Listing{}
 	for _, c := range crawlers {
 		log.Println("checking " + c.Name() + "...")
 		listings, err := c.GetForSale(agents.TargetSjobyrne)
@@ -66,16 +73,14 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 			curListings[c.Name()+":"+listing.Name] = repos.Void{}
 
 			if _, ok := prevListings[c.Name()+":"+listing.Name]; !ok {
-				// new listings
-				newListings = append(newListings, listing)
-				//
+				newListings[c.channel] = append(newListings[c.channel], listing)
 			}
 		}
 	}
 
 	log.Printf("found %d new listings\n", len(newListings))
 
-	if err := sendBlocksToSlack(ctx, newListings, ""); err != nil {
+	if err := sendBlocksToSlack(ctx, newListings); err != nil {
 		return err
 	}
 
@@ -85,24 +90,27 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	return crawlerErrs
 }
 
-func sendBlocksToSlack(ctx context.Context, newListings []agents.Listing, channel string) error {
+func sendBlocksToSlack(ctx context.Context, newListings map[string][]agents.Listing) error {
 	if len(newListings) == 0 {
 		return nil
 	}
-	var blocks []slack.Block
-	for i, l := range newListings {
-		blocks = append(blocks, homeToBlock(l))
-		if i > 0 && i%49 == 0 {
+	for channel, listings := range newListings {
+		var blocks []slack.Block
+		for i, l := range listings {
+			blocks = append(blocks, homeToBlock(l))
+			if i > 0 && i%49 == 0 {
+				if err := postToSlack(ctx, blocks, nil, channel); err != nil {
+					return err
+				}
+				blocks = nil
+			}
+		}
+		if blocks != nil {
 			if err := postToSlack(ctx, blocks, nil, channel); err != nil {
 				return err
 			}
-			blocks = nil
 		}
-	}
-	if blocks != nil {
-		if err := postToSlack(ctx, blocks, nil, channel); err != nil {
-			return err
-		}
+
 	}
 	return nil
 }

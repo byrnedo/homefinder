@@ -48,7 +48,7 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 	}
 	nodes := css.QueryAll(n, css.MustCompile("body div.search__results div.grid__item"))
 	if len(nodes) == 0 {
-		return nil, xcss.NotFoundErr{}
+		return nil, xcss.NotFoundErr{Name: "grid__item"}
 	}
 	for _, n = range nodes {
 
