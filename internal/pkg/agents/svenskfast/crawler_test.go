@@ -9,14 +9,14 @@ import (
 var testBody string
 
 func TestCrawler(t *testing.T) {
-	p := Crawler{body: testBody}
+	p := Crawler{body: ""}
 
-	l, err := p.GetForSale()
+	l, err := p.GetForSale("")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(l) != 10 {
+	if len(l) != 16 {
 		t.Fatalf("wrong number of listings %d", len(l))
 	}
 	t.Log(l)

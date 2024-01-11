@@ -1,6 +1,7 @@
 package svenskfast
 
 import (
+	"crypto/tls"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -22,11 +23,16 @@ func (p Crawler) Name() string {
 
 func (p *Crawler) fetch(target agents.Target) error {
 
-	u := "https://www.svenskfast.se/hus/kalmar/kalmar/kalmar/?t=Villa,Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt&l=morbylanga/farjestaden"
+	u := "https://www.svenskfast.se/hus/kalmar/borgholm/farjestaden/?t=Radhus,Fritidshus,Nyproduktionsprojekt,Lantbruk,Tomt"
 
-	res, err := http.DefaultClient.Get(u)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // <--- Problem
+	}
+	c := &http.Client{Transport: tr}
+
+	res, err := c.Get(u)
 	if err != nil {
-		return nil
+		return err
 	}
 	b, _ := ioutil.ReadAll(res.Body)
 	p.body = string(b)
