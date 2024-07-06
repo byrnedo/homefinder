@@ -27,7 +27,7 @@ type Listing struct {
 
 type Crawler interface {
 	Name() string
-	GetForSale(target Target) ([]Listing, error)
+	GetForSale() ([]Listing, error)
 }
 
 type Target string

@@ -56,7 +56,7 @@ type response struct {
 	TotalLength int      `json:"totalLength"`
 }
 
-func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
+func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 
 	address := "https://app-lansfast-api.azurewebsites.net/api/Estates/GetForFilter?municipality=M%C3%B6rbyl%C3%A5nga&estateType=Villa&sortOrder=0"
 

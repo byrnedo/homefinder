@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"io"
 	"net/http"
 	"net/http/httputil"
 	"strings"
+
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
 )
 
 type Crawler struct{}
@@ -181,7 +182,7 @@ type ListingsResponse struct {
 	SavedSearch  bool   `json:"savedSearch"`
 }
 
-func (c Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
+func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 	return c.getForSalePage(0)
 }
 func (c Crawler) getForSalePage(from int) (listings []agents.Listing, err error) {

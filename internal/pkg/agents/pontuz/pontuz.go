@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/html"
+
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/xcss"
-	"golang.org/x/net/html"
 )
 
 type Crawler struct {
@@ -34,7 +35,7 @@ func (p *Crawler) fetch() error {
 
 }
 
-func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err error) {
+func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 	if p.body == "" {
 		if err := p.fetch(); err != nil {
 			return nil, err
@@ -47,7 +48,7 @@ func (p *Crawler) GetForSale(target agents.Target) (ls []agents.Listing, err err
 	}
 	nodes := css.QueryAll(n, css.MustCompile("body>div.wrapper>div.ol-wrapper.container>div.col"))
 	if len(nodes) == 0 {
-		return nil, xcss.NotFoundErr{"body>div.wrapper>div.ol-wrapper.container>div.col"}
+		return nil, xcss.NotFoundErr{Name: "body>div.wrapper>div.ol-wrapper.container>div.col"}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
 

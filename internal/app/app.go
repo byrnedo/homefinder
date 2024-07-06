@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/byrnedo/homefinder/internal/pkg/agents/daft"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/byrnedo/homefinder/internal/pkg/agents/daft"
 
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/erikolsson"
@@ -60,7 +61,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	newListings := map[string][]agents.Listing{}
 	for _, c := range crawlers {
 		log.Println("checking " + c.Name() + "...")
-		listings, err := c.GetForSale(agents.TargetSjobyrne)
+		listings, err := c.GetForSale()
 		if err != nil {
 			crawlerErrs = errors.Join(crawlerErrs, fmt.Errorf("%s: %w", c.Name(), err))
 			log.Printf("ERROR (%s): %s", c.Name(), err)

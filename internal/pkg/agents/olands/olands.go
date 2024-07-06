@@ -7,10 +7,11 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/html"
+
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/xcss"
-	"golang.org/x/net/html"
 )
 
 type Crawler struct {
@@ -31,7 +32,7 @@ func (o Crawler) Name() string {
 	return "Ölandsmäklaren"
 }
 
-func (o *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
+func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 	if o.body == "" {
 		if err := o.fetch(); err != nil {
 			return nil, err

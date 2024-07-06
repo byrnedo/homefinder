@@ -11,7 +11,7 @@ var testBody string
 func TestCrawler(t *testing.T) {
 	p := Crawler{body: ""}
 
-	l, err := p.GetForSale("")
+	l, err := p.GetForSale()
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,10 +8,11 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/html"
+
 	css "github.com/andybalholm/cascadia"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/xcss"
-	"golang.org/x/net/html"
 )
 
 type Crawler struct {
@@ -19,7 +20,7 @@ type Crawler struct {
 	addresses []string
 }
 
-func (o *Crawler) fetch(target agents.Target) error {
+func (o *Crawler) fetch() error {
 
 	o.addresses = []string{
 		"https://www.maklarhuset.se/bostad/sverige/kalmar-lans-lan/farjestaden-kommun?undefined",
@@ -43,8 +44,8 @@ func (o Crawler) Name() string {
 	return "Mäklarhuset"
 }
 
-func (o *Crawler) GetForSale(target agents.Target) (listings []agents.Listing, err error) {
-	if err := o.fetch(target); err != nil {
+func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
+	if err := o.fetch(); err != nil {
 		return nil, err
 	}
 
