@@ -4,12 +4,19 @@ metadata:
   name: cron
   namespace: homefinder
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:
         spec:
+          restartPolicy: Never
           containers:
           - name: cron
             image: ghcr.io/byrnedo/homefinder
             imagePullPolicy: Always
+            env:
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: config
+                  key: slack_webhook_url

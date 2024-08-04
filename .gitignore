@@ -5,3 +5,4 @@ listings-seen
 out.yml
 scripts/build/*
 !scripts/build/.gitkeep
+secret.yaml
