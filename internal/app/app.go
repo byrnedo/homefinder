@@ -17,7 +17,6 @@ import (
 	"github.com/byrnedo/homefinder/internal/pkg/agents/maklarhuset"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/olands"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/pontuz"
-	"github.com/byrnedo/homefinder/internal/pkg/agents/rydmanlanga"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/svenskfast"
 	"github.com/byrnedo/homefinder/internal/pkg/repos"
 
@@ -39,7 +38,6 @@ type crawlerConf struct {
 func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 	crawlers := []crawlerConf{
 		{Crawler: &pontuz.Crawler{}, channel: "#oland"},
-		{Crawler: &rydmanlanga.Crawler{}, channel: "#oland"},
 		{Crawler: &fastighetsbyran.Crawler{}, channel: "#oland"},
 		{Crawler: &olands.Crawler{}, channel: "#oland"},
 		{Crawler: &svenskfast.Crawler{}, channel: "#oland"},

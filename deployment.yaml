@@ -4,16 +4,23 @@ metadata:
   name: cron
   namespace: homefinder
 spec:
-  schedule: "* * * * *"
+  schedule: "*/5 * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           restartPolicy: Never
+          volumes:
+          - name: cache
+            hostPath:
+              path: /opt/homefinder
           containers:
           - name: cron
-            image: ghcr.io/byrnedo/homefinder
+            image: ghcr.io/byrnedo/homefinder:latest@sha256:35ce657c268d1b28a8a06141fade60a783d3162976e9d9a380608657a46dc881
             imagePullPolicy: Always
+            volumeMounts:
+            - mountPath: /cache
+              name: cache
             env:
             - name: SLACK_WEBHOOK_URL
               valueFrom:

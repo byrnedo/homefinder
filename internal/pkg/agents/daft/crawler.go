@@ -239,7 +239,7 @@ func (c Crawler) getForSalePage(from int) (listings []agents.Listing, err error)
 
 	for _, daftListing := range result.Listings {
 		l := agents.Listing{
-			Name:         fmt.Sprintf("%s (%d)", daftListing.Listing.Title, daftListing.Listing.Id),
+			Name:         strings.ReplaceAll(fmt.Sprintf("%s (%d)", daftListing.Listing.Title, daftListing.Listing.Id), "\n", ""),
 			Link:         "http://daft.ie" + daftListing.Listing.SeoFriendlyPath,
 			Type:         getListingType(daftListing.Listing.PropertyType),
 			Upcoming:     false,

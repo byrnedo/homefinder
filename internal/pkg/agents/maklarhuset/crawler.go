@@ -1,11 +1,11 @@
 package maklarhuset
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
-	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -57,71 +57,72 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 			return nil, err
 		}
 
-		nodes := css.QueryAll(n, css.MustCompile("div.uk-width-large-1-2 a"))
+		nodes := css.QueryAll(n, css.MustCompile("div.uk-width-large-1-2 a img"))
 
-		var compressSpace = regexp.MustCompile(`\s+`)
+		//var compressSpace = regexp.MustCompile(`\s+`)
 
 		var urlListings []agents.Listing
 		for _, n = range nodes {
-			n = n.Parent
-			dataObj := css.Query(n.Parent, css.MustCompile("div[data-object-id]"))
-			if dataObj == nil {
-				break
-			}
+			n = n.Parent.Parent.Parent // back out of the image
 			a := css.Query(n, css.MustCompile("a"))
+			img := css.Query(n, css.MustCompile("img"))
 
 			listing := agents.Listing{
 				Link:  "https://www.maklarhuset.se" + xcss.FindAttr(a, "href"),
-				Image: xcss.FindAttr(dataObj, "data-object-image"),
+				Image: xcss.FindAttr(img, "src"),
 			}
 
-			title := xcss.FindAttr(dataObj, "data-object-address") + " " + xcss.FindAttr(dataObj, "data-object-city") + "(" + xcss.FindAttr(dataObj, "data-object-id") + ")"
-
-			listing.Name = title
-
-			var facts []string
-			for _, f := range css.QueryAll(n, css.MustCompile("figcaption>div.uk-h3>span")) {
-
-				raw := xcss.CollectText(f)
-				raw = strings.ReplaceAll(raw, "\n", "")
-				raw = strings.TrimSpace(raw)
-				raw = compressSpace.ReplaceAllString(raw, " ")
-				switch raw {
-				case "Villa":
-					listing.Type = agents.ListingTypeHouse
-				case "Fritidshus":
-					listing.Type = agents.ListingTypeSummerHouse
-				case "Gård":
-					listing.Type = agents.ListingTypeFarm
-				case "Tomt":
-					listing.Type = agents.ListingTypePlot
-				case "Lägenhet":
-					listing.Type = agents.ListingTypeApartment
-				case "Övrigt":
-					listing.Type = agents.ListingTypeUnknown
-				case "Radhus":
-					listing.Type = agents.ListingTypeTerrace
-
-				}
-				if listing.SquareMetres == 0 {
-					if strings.HasSuffix(raw, "kvm") {
-						sqmStr := strings.ReplaceAll(strings.TrimSpace(strings.TrimSuffix(raw, "kvm")), " ", "")
-						flVal, _ := strconv.ParseFloat(sqmStr, 32)
-						listing.SquareMetres = int(flVal)
-					}
-				}
-
-				facts = append(facts, raw)
+			fmt.Println(n)
+			titleNode := css.Query(n, css.MustCompile(".mh-card-title-small"))
+			if titleNode == nil {
+				return listings, errors.New("failed to find title")
 			}
-			if listing.Type == agents.ListingTypeApartment {
-				continue
-			}
-			listing.Facts = facts
 
-			if len(facts) > 0 && strings.HasSuffix(facts[0], " kr") {
-				priceStr := xcss.RemoveSpace(strings.TrimSuffix(facts[0], " kr"))
-				listing.Price, _ = strconv.Atoi(priceStr)
-			}
+			listing.Name = xcss.CollectText(titleNode)
+
+			//var facts []string
+			//for _, f := range css.QueryAll(n, css.MustCompile("figcaption>div.uk-h3>span")) {
+			//
+			//	raw := xcss.CollectText(f)
+			//	raw = strings.ReplaceAll(raw, "\n", "")
+			//	raw = strings.TrimSpace(raw)
+			//	raw = compressSpace.ReplaceAllString(raw, " ")
+			//	switch raw {
+			//	case "Villa":
+			//		listing.Type = agents.ListingTypeHouse
+			//	case "Fritidshus":
+			//		listing.Type = agents.ListingTypeSummerHouse
+			//	case "Gård":
+			//		listing.Type = agents.ListingTypeFarm
+			//	case "Tomt":
+			//		listing.Type = agents.ListingTypePlot
+			//	case "Lägenhet":
+			//		listing.Type = agents.ListingTypeApartment
+			//	case "Övrigt":
+			//		listing.Type = agents.ListingTypeUnknown
+			//	case "Radhus":
+			//		listing.Type = agents.ListingTypeTerrace
+			//
+			//	}
+			//	if listing.SquareMetres == 0 {
+			//		if strings.HasSuffix(raw, "kvm") {
+			//			sqmStr := strings.ReplaceAll(strings.TrimSpace(strings.TrimSuffix(raw, "kvm")), " ", "")
+			//			flVal, _ := strconv.ParseFloat(sqmStr, 32)
+			//			listing.SquareMetres = int(flVal)
+			//		}
+			//	}
+			//
+			//	facts = append(facts, raw)
+			//}
+			//if listing.Type == agents.ListingTypeApartment {
+			//	continue
+			//}
+			//listing.Facts = facts
+
+			//if len(facts) > 0 && strings.HasSuffix(facts[0], " kr") {
+			//	priceStr := xcss.RemoveSpace(strings.TrimSuffix(facts[0], " kr"))
+			//	listing.Price, _ = strconv.Atoi(priceStr)
+			//}
 			urlListings = append(urlListings, listing)
 		}
 		listings = append(listings, urlListings...)

@@ -58,7 +58,7 @@ type response struct {
 
 func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 
-	address := "https://www.erikolsson.se/api/search/?areaids=117224-Färjestaden,Mörbylånga&propertytype=villa,tomt-mark,radhus,parhus,kedjehus&internalOnly=true"
+	address := "https://www.erikolsson.se/api/search?municipalityCodes%5B0%5D=840&showUpComingSales=true&page=0&propertyType=house&minRooms=0&maxPrice=8000000&sort=publishDate&sortOrder=desc"
 
 	res, err := http.Get(address)
 	if err != nil {
