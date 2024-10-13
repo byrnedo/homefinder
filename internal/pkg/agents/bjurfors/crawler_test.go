@@ -1,4 +1,4 @@
-package erikolsson
+package bjurfors
 
 import (
 	_ "embed"

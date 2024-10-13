@@ -1,4 +1,4 @@
-package erikolsson
+package bjurfors
 
 import (
 	css "github.com/andybalholm/cascadia"
