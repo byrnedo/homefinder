@@ -8,8 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/byrnedo/homefinder/internal/pkg/agents/daft"
-
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/erikolsson"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/fastighetsbyran"
@@ -44,7 +42,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 		{Crawler: &maklarhuset.Crawler{}, channel: "#oland"},
 		{Crawler: &erikolsson.Crawler{}, channel: "#oland"},
 		{Crawler: &lanfast.Crawler{}, channel: "#oland"},
-		{Crawler: &daft.Crawler{}, channel: "#daft"},
+		//{Crawler: &daft.Crawler{}, channel: "#daft"},
 	}
 
 	prevListings, err := historyRepo.GetHistory(ctx)
