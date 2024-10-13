@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/byrnedo/homefinder/internal/pkg/agents/bjurfors"
+	"github.com/byrnedo/homefinder/internal/pkg/agents/gardefalk"
 	"log"
 	"os"
 	"strings"
@@ -44,6 +45,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 		{Crawler: &erikolsson.Crawler{}, channel: "#oland"},
 		{Crawler: &lanfast.Crawler{}, channel: "#oland"},
 		{Crawler: &bjurfors.Crawler{}, channel: "#oland"},
+		{Crawler: &gardefalk.Crawler{}, channel: "#oland"},
 		//{Crawler: &daft.Crawler{}, channel: "#daft"},
 	}
 
