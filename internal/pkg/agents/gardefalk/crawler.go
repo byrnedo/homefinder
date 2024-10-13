@@ -16,7 +16,7 @@ type Crawler struct {
 }
 
 func (c Crawler) Name() string {
-	return "Bjurfors"
+	return "Gardefalk"
 }
 
 func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
