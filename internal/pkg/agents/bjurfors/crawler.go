@@ -39,10 +39,10 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 	for _, n = range nodes {
 
 		a := css.Query(n, css.MustCompile("a"))
-		img := css.Query(n, css.MustCompile("source"))
+		img := css.Query(n, css.MustCompile("picture>img"))
 		listing := agents.Listing{
 			Link:  "https://bjurfors.se" + xcss.FindAttr(a, "href"),
-			Image: xcss.FindAttr(img, "srcset"),
+			Image: "https://bjurfors.se" + xcss.FindAttr(img, "src"),
 		}
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3")))
