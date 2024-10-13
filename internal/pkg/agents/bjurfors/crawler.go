@@ -20,6 +20,8 @@ func (c Crawler) Name() string {
 
 func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 
+	var imgRegex = regexp.MustCompile(".*contentassets/")
+
 	address := "https://www.bjurfors.se/sv/tillsalu/kalmar-lan/morbylanga/farjestaden/?qdata=d%245evjg4l9otbn1ijo&FormId=6362f9d8-928e-4fe3-8abc-a8f157a65244"
 
 	res, err := http.Get(address)
@@ -42,7 +44,7 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 		img := css.Query(n, css.MustCompile("picture>img"))
 		listing := agents.Listing{
 			Link:  "https://bjurfors.se" + xcss.FindAttr(a, "href"),
-			Image: "https://bjurfors.se" + xcss.FindAttr(img, "src"),
+			Image: "https://bjurfors.se" + imgRegex.ReplaceAllString(xcss.FindAttr(img, "src"), "/contentassets/"),
 		}
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3")))
