@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
+	"github.com/byrnedo/homefinder/internal/pkg/agents"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -13,8 +15,8 @@ import (
 type Void struct{}
 
 type HistoryRepo interface {
-	GetHistory(ctx context.Context) (map[string]Void, error)
-	SaveHistory(ctx context.Context, keys map[string]Void) error
+	GetHistory(ctx context.Context) ([]agents.Listing, error)
+	SaveHistory(ctx context.Context, listings []agents.Listing) error
 }
 
 type S3HomesBjelinHistoryRepo struct {
@@ -111,21 +113,23 @@ type FileHistoryRepo struct {
 	Name string
 }
 
-func (e FileHistoryRepo) GetHistory(ctx context.Context) (map[string]Void, error) {
+func (e FileHistoryRepo) GetHistory(ctx context.Context) (list []agents.Listing, err error) {
 	b, _ := os.ReadFile(e.Name)
 
-	m := map[string]Void{}
 	scanner := bufio.NewScanner(bytes.NewBuffer(b))
 	for scanner.Scan() {
 		text := scanner.Text()
-		m[text] = Void{}
+		l := agents.Listing{}
+		err := json.Unmarshal([]byte(text), &l)
+		if err != nil {
+			return nil, err
+		}
+		list = append(list, l)
 	}
-	return m, nil
+	return list, nil
 }
 
-func (e FileHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) error {
-	orig, _ := e.GetHistory(ctx)
-
+func (e FileHistoryRepo) SaveHistory(ctx context.Context, list []agents.Listing) error {
 	f, err := os.OpenFile(e.Name, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil {
 		return err
@@ -137,16 +141,13 @@ func (e FileHistoryRepo) SaveHistory(ctx context.Context, keys map[string]Void) 
 	_ = f.Truncate(0)
 	_, _ = f.Seek(0, 0)
 
-	if orig == nil {
-		orig = make(map[string]Void)
-	}
+	for _, listing := range list {
+		b, err := json.Marshal(listing)
+		if err != nil {
+			return err
+		}
 
-	for k, v := range keys {
-		orig[k] = v
-	}
-
-	for k := range orig {
-		_, err := f.WriteString(k + "\n")
+		_, err = f.WriteString(string(b) + "\n")
 		if err != nil {
 			return err
 		}

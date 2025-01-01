@@ -36,7 +36,7 @@ type crawlerConf struct {
 	channel string
 }
 
-func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
+func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo, postToSlack bool) error {
 	crawlers := []crawlerConf{
 		{Crawler: &pontuz.Crawler{}, channel: "#oland"},
 		{Crawler: &fastighetsbyran.Crawler{}, channel: "#oland"},
@@ -56,11 +56,12 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 		return fmt.Errorf("failed to load from disk: %s", err)
 	}
 
-	curListings := map[string]repos.Void{}
+	var curListings []agents.Listing
 
 	var crawlerErrs error
 
 	newListings := map[string][]agents.Listing{}
+	newCount := 0
 	for _, c := range crawlers {
 		log.Println("checking " + c.Name() + "...")
 		listings, err := c.GetForSale()
@@ -72,19 +73,34 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo) error {
 		log.Printf("found %d listings for %s\n", len(listings), c.Name())
 
 		for _, listing := range listings {
+			listing.Crawler = c.Name()
 
-			curListings[c.Name()+":"+listing.Name] = repos.Void{}
+			curListings = append(curListings, listing)
 
-			if _, ok := prevListings[c.Name()+":"+listing.Name]; !ok {
+			// puke
+			alreadyRecorded := false
+			for _, prevListing := range prevListings {
+				if prevListing.Name == listing.Name && prevListing.Crawler == listing.Crawler {
+					alreadyRecorded = true
+					break
+				}
+			}
+
+			if !alreadyRecorded {
 				newListings[c.channel] = append(newListings[c.channel], listing)
+				newCount++
 			}
 		}
 	}
 
-	log.Printf("found %d new listings\n", len(newListings))
+	log.Printf("found %d new listings\n", newCount)
 
-	if err := sendBlocksToSlack(ctx, newListings); err != nil {
-		return err
+	if postToSlack {
+
+		if err := sendBlocksToSlack(ctx, newListings); err != nil {
+			return err
+		}
+
 	}
 
 	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {

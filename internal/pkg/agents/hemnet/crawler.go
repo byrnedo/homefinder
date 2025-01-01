@@ -46,7 +46,7 @@ func (c Crawler) GetForSale() (listings []agents.Listing, err error) {
 		if err != nil {
 			return nil, err
 		}
-		nodes := css.QueryAll(n, css.MustCompile("div>a.hcl-card"))
+		nodes := css.QueryAll(n, css.MustCompile("div[data-testid=\"result-list\"]>a"))
 		if len(nodes) == 0 {
 			log.Println("no projects")
 			return listings, nil

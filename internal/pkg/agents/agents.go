@@ -15,6 +15,7 @@ const (
 )
 
 type Listing struct {
+	Crawler      string
 	Name         string
 	Link         string
 	Type         ListingType

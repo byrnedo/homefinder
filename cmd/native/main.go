@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	err := app.RunHousefinder(context.Background(), repos.FileHistoryRepo{Name: "./cache/cache.txt"})
+	err := app.RunHousefinder(context.Background(), repos.FileHistoryRepo{Name: "./cache/cache.txt"}, true)
 	if err != nil {
 		panic(err)
 	}
