@@ -61,6 +61,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo, postToSl
 	var crawlerErrs error
 
 	newListings := map[string][]agents.Listing{}
+	newListingsFlat := []agents.Listing{}
 	newCount := 0
 	for _, c := range crawlers {
 		log.Println("checking " + c.Name() + "...")
@@ -88,6 +89,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo, postToSl
 
 			if !alreadyRecorded {
 				newListings[c.channel] = append(newListings[c.channel], listing)
+				newListingsFlat = append(newListingsFlat, listing)
 				newCount++
 			}
 		}
@@ -103,7 +105,7 @@ func RunHousefinder(ctx context.Context, historyRepo repos.HistoryRepo, postToSl
 
 	}
 
-	if err := historyRepo.SaveHistory(ctx, curListings); err != nil {
+	if err := historyRepo.SaveHistory(ctx, newListingsFlat); err != nil {
 		return err
 	}
 	return crawlerErrs

@@ -130,16 +130,13 @@ func (e FileHistoryRepo) GetHistory(ctx context.Context) (list []agents.Listing,
 }
 
 func (e FileHistoryRepo) SaveHistory(ctx context.Context, list []agents.Listing) error {
-	f, err := os.OpenFile(e.Name, os.O_RDWR|os.O_CREATE, 0755)
+	f, err := os.OpenFile(e.Name, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0755)
 	if err != nil {
 		return err
 	}
 	defer func(f *os.File) {
 		_ = f.Close()
 	}(f)
-
-	_ = f.Truncate(0)
-	_, _ = f.Seek(0, 0)
 
 	for _, listing := range list {
 		b, err := json.Marshal(listing)
