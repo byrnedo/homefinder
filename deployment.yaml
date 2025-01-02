@@ -16,7 +16,7 @@ spec:
               path: /opt/homefinder
           containers:
           - name: cron
-            image: ghcr.io/byrnedo/homefinder@sha256:fde6cebc83762acbc257d2bc023743b09a22df76ae2e2ba9c2dca61fb4cd377b
+            image: ghcr.io/byrnedo/homefinder@sha256:2ed1fd3a3fb182e2aa09222603d3ec1e2aec25bd4d853e765032e49b75e6acdb
             imagePullPolicy: Always
             volumeMounts:
             - mountPath: /cache
@@ -27,3 +27,13 @@ spec:
                 secretKeyRef:
                   name: config
                   key: slack_webhook_url
+            - name: CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: config
+                  key: credentials
+            - name: SPREADSHEET_ID
+              valueFrom:
+                secretKeyRef:
+                  name: config
+                  key: spreadsheet_id

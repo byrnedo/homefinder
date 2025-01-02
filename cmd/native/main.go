@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/byrnedo/homefinder/internal/app/job"
 	"os"
 
-	"github.com/byrnedo/homefinder/internal/app"
 	"github.com/byrnedo/homefinder/internal/pkg/repos"
 )
 
@@ -16,7 +16,7 @@ func mustEnv(name string) string {
 	}
 }
 
-func main() {
+func gSheetRepo() repos.HistoryRepo {
 
 	cCredentials := mustEnv("CREDENTIALS")
 	cSpreadsheetID := mustEnv("SPREADSHEET_ID")
@@ -26,8 +26,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	return repo
+}
 
-	err = app.RunHousefinder(context.Background(), repo, false)
+func main() {
+
+	repo := gSheetRepo()
+
+	err := job.RunHousefinder(context.Background(), repo, true)
 	if err != nil {
 		panic(err)
 	}

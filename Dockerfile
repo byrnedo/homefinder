@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine as builder
+FROM golang:1.21-alpine as builder
 WORKDIR /server
 ENV CGO_ENABLED 0
 ENV GOOS linux

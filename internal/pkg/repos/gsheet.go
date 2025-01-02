@@ -8,9 +8,12 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
-	"strconv"
+	"log"
+	"strings"
 	"time"
 )
+
+const FACTS_SEP = " | "
 
 type GsheetRepo struct {
 	svc           *sheets.Service
@@ -36,6 +39,9 @@ func (c *GsheetRepo) GetHistory(ctx context.Context) (listings []agents.Listing,
 		l, err := rowToListing(row)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert row %d to listing: %w", i, err)
+		}
+		if l == nil {
+			continue
 		}
 		listings = append(listings, *l)
 
@@ -79,8 +85,9 @@ func ref[T any](v T) *T {
 }
 
 func rowToListing(row []any) (*agents.Listing, error) {
-	if len(row) < 8 {
-		return nil, fmt.Errorf("row too short")
+	if len(row) < 7 {
+		log.Println("row too short to parse to listing")
+		return nil, nil
 	}
 
 	listing := agents.Listing{}
@@ -89,14 +96,19 @@ func rowToListing(row []any) (*agents.Listing, error) {
 	listing.Name = row[1].(string)
 	listing.Image = row[2].(string)
 	listing.Link = row[3].(string)
-	listing.Price, _ = strconv.Atoi(row[4].(string))
-	listing.SquareMetres, _ = strconv.Atoi(row[5].(string))
+	listing.Facts = strings.Split(row[4].(string), FACTS_SEP)
 	listing.Type = agents.ListingType(row[6].(string))
 
 	return &listing, nil
 
 }
 func listingToCells(now time.Time, s agents.Listing) (cells []*sheets.CellData) {
+
+	for i, f := range s.Facts {
+		if strings.TrimSpace(f) == "" {
+			s.Facts = append(s.Facts[:i], s.Facts[i+1:]...)
+		}
+	}
 
 	cells = append(cells,
 		&sheets.CellData{
@@ -121,12 +133,7 @@ func listingToCells(now time.Time, s agents.Listing) (cells []*sheets.CellData) 
 		},
 		&sheets.CellData{
 			UserEnteredValue: &sheets.ExtendedValue{
-				NumberValue: ref(float64(s.Price)),
-			},
-		},
-		&sheets.CellData{
-			UserEnteredValue: &sheets.ExtendedValue{
-				NumberValue: ref(float64(s.SquareMetres)),
+				StringValue: ref(strings.Join(s.Facts, FACTS_SEP)),
 			},
 		},
 		&sheets.CellData{
