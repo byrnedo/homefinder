@@ -104,11 +104,14 @@ func rowToListing(row []any) (*agents.Listing, error) {
 }
 func listingToCells(now time.Time, s agents.Listing) (cells []*sheets.CellData) {
 
-	for i, f := range s.Facts {
-		if strings.TrimSpace(f) == "" {
-			s.Facts = append(s.Facts[:i], s.Facts[i+1:]...)
+	var nonEmptyFacts []string
+	for _, f := range s.Facts {
+		f = strings.TrimSpace(f)
+		if f != "" {
+			nonEmptyFacts = append(nonEmptyFacts, f)
 		}
 	}
+	s.Facts = nonEmptyFacts
 
 	cells = append(cells,
 		&sheets.CellData{
