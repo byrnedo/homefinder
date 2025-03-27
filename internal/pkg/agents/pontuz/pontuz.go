@@ -56,15 +56,15 @@ func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
 
-		hit := false
-		for _, term := range []string{"FÄRJESTADEN", "RUNSBÄCK"} {
+		ignore := false
+		for _, term := range []string{"KALMAR", "OSKARSHAMN", "NYBRO", "TORSÅS", "MÖNSTERÅS", "BORGHOLM"} {
 			if strings.Contains(strings.ToUpper(title), term) {
-				hit = true
+				ignore = true
 				break
 			}
 		}
 
-		if !hit {
+		if ignore {
 			log.Printf("ignoring %s", title)
 			continue
 		}

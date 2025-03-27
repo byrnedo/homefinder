@@ -11,7 +11,7 @@ import (
 var testBody string
 
 func TestPontuz(t *testing.T) {
-	p := Crawler{body: testBody}
+	p := Crawler{}
 
 	l, err := p.GetForSale()
 	if err != nil {
