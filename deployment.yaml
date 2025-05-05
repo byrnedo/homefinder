@@ -16,7 +16,7 @@ spec:
               path: /opt/homefinder
           containers:
           - name: cron
-            image: ghcr.io/byrnedo/homefinder@sha256:375b7730dbb464ca3e703ac304813d96e73c4a00c810e9ebef3cdf8f2a0f7891
+            image: ghcr.io/byrnedo/homefinder@sha256:2f87f6d2919b95002f15f55052513aafcfe542628338382b57e7514cba445996
             imagePullPolicy: Always
             volumeMounts:
             - mountPath: /cache
