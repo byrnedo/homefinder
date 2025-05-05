@@ -43,21 +43,17 @@ func (o *Crawler) GetForSale() (listings []agents.Listing, err error) {
 	if err != nil {
 		return nil, err
 	}
-	nodes := css.QueryAll(n, css.MustCompile("div.filteritem"))
+	nodes := css.QueryAll(n, css.MustCompile("#Container>a"))
 	if len(nodes) == 0 {
 		return nil, xcss.NotFoundErr{}
 	}
 	var compressSpace = regexp.MustCompile(`\s+`)
 	for _, n = range nodes {
-		if xcss.HasClass(n, "CMNYPROD596TF9JK1PVBRKGH") {
-			continue
-		}
-
-		a := css.Query(n, css.MustCompile("a"))
-		img := css.Query(n, css.MustCompile("source"))
+		a := n
+		img := css.Query(n, css.MustCompile(".oc-img-wrapper>img"))
 		listing := agents.Listing{
 			Link:  "https://olandsmaklaren.se" + xcss.FindAttr(a, "href"),
-			Image: xcss.FindAttr(img, "srcset"),
+			Image: xcss.FindAttr(img, "src"),
 		}
 
 		title := xcss.CollectText(css.Query(n, css.MustCompile("h3")))

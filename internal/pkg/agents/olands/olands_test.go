@@ -16,7 +16,7 @@ func TestOlands(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(l) != 14 {
+	if len(l) != 71 {
 		t.Fatalf("wrong number of listings: %d", len(l))
 	}
 	t.Log(l)
