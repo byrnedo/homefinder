@@ -9,6 +9,7 @@ import (
 	"github.com/byrnedo/homefinder/internal/pkg/agents/hemnet"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
@@ -29,6 +30,13 @@ func dashIfEmpty(s string) string {
 		return "-"
 	}
 	return s
+}
+
+func dashIfZero(i int) string {
+	if i == 0 {
+		return "-"
+	}
+	return strconv.Itoa(i)
 }
 
 type crawlerConf struct {
@@ -138,15 +146,16 @@ func sendBlocksToSlack(ctx context.Context, newListings map[string][]agents.List
 
 func homeToBlock(l agents.Listing) slack.Block {
 	facts := strings.Join(l.Facts, " - ")
-	if facts == "" {
-		facts = "-"
-	}
 	return slack.SectionBlock{
 		Type: slack.MBTSection,
 		Fields: []*slack.TextBlockObject{
 			{
 				Type: slack.MarkdownType,
 				Text: dashIfEmpty(l.Name),
+			},
+			{
+				Type: slack.MarkdownType,
+				Text: dashIfZero(l.Price),
 			},
 			{
 				Type: slack.MarkdownType,

@@ -19,7 +19,7 @@ func (p *Crawler) Name() string {
 func (p *Crawler) fetch() error {
 
 	urls := []string{
-		"https://data.notar.se/objects?limit=25&sortBy=date&sortOrder=desc&areaId=CMOMRADE2TKJ0RM871EHKICV&areaId=CMOMRADE3512A4TKMP4G0PBS&areaId=CMOMRADE3UJIGL6OQ1L18VHK&areaId=CMOMRADE3H9C0TK9HH31J44L&assignmentStatus=Kommand&assignmentStatus=Till%20salu&assignmentStatus=P%C3%A5g%C3%A5ende&assignmentStatus=Reserverad",
+		"https://data.notar.se/objects?limit=25&sortBy=date&sortOrder=desc&areaId=CMOMRADE2TKJ0RM871EHKICV&areaId=CMOMRADE3512A4TKMP4G0PBS&areaId=CMOMRADE3UJIGL6OQ1L18VHK&areaId=CMOMRADE3H9C0TK9HH31J44L&assignmentStatus=Kommande&assignmentStatus=Till%20salu&assignmentStatus=P%C3%A5g%C3%A5ende&assignmentStatus=Reserverad",
 	}
 
 	for _, url := range urls {
@@ -77,9 +77,9 @@ func (p *Crawler) GetForSale() (listings []agents.Listing, err error) {
 			Type:     getListingType(notarListing.Type),
 			Upcoming: false,
 			Facts: []string{
-				fmt.Sprintf("%d", notarListing.Price.StartingPrice),
+				fmt.Sprintf("%dm2", notarListing.LivingSpaceArea),
 				fmt.Sprintf("%d rooms", notarListing.NumberOfRooms),
-				fmt.Sprintf("%d plot", notarListing.Plot.Area),
+				fmt.Sprintf("%dm2 plot", notarListing.Plot.Area),
 			},
 			SquareMetres: notarListing.LivingSpaceArea,
 			Price:        notarListing.Price.StartingPrice,
