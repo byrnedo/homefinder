@@ -1,117 +1,93 @@
 package pontuz
 
 import (
-	"io/ioutil"
-	"log"
-	"net/http"
-	"regexp"
-	"strconv"
-	"strings"
-
-	"golang.org/x/net/html"
-
-	css "github.com/andybalholm/cascadia"
+	"encoding/json"
+	"fmt"
 	"github.com/byrnedo/homefinder/internal/pkg/agents"
-	"github.com/byrnedo/homefinder/internal/pkg/xcss"
+	"net/http"
+	"strings"
 )
 
 type Crawler struct {
-	body string
+	listings []NotarListing
 }
 
-func (p Crawler) Name() string {
+func (p *Crawler) Name() string {
 	return "Pontuz Löfgren"
 }
 
 func (p *Crawler) fetch() error {
 
-	res, err := http.DefaultClient.Get("https://www.pontuzlofgren.se/till-salu")
-	if err != nil {
-		return nil
+	urls := []string{
+		"https://data.notar.se/objects?limit=25&sortBy=date&sortOrder=desc&areaId=CMOMRADE2TKJ0RM871EHKICV&areaId=CMOMRADE3512A4TKMP4G0PBS&areaId=CMOMRADE3UJIGL6OQ1L18VHK&areaId=CMOMRADE3H9C0TK9HH31J44L&assignmentStatus=Kommand&assignmentStatus=Till%20salu&assignmentStatus=P%C3%A5g%C3%A5ende&assignmentStatus=Reserverad",
 	}
-	b, _ := ioutil.ReadAll(res.Body)
-	p.body = string(b)
+
+	for _, url := range urls {
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			return err
+		}
+		req.Header.Set("Authorization", "Basic bm90YXI6OWd6ekRmRGZCVXpjMjJleVhqUG53bU5m")
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil
+		}
+
+		if res.StatusCode != 200 {
+			return fmt.Errorf("bad response: %d", res.StatusCode)
+		}
+		defer res.Body.Close()
+		result := []NotarListing{}
+		if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+			return err
+		}
+		p.listings = append(p.listings, result...)
+	}
 	return nil
 
 }
 
-func (p *Crawler) GetForSale() (ls []agents.Listing, err error) {
-	if p.body == "" {
-		if err := p.fetch(); err != nil {
-			return nil, err
-		}
+func getListingType(notarType string) agents.ListingType {
+	switch strings.ToLower(notarType) {
+	case "house":
+		return agents.ListingTypeHouse
+	case "housingcooperative":
+		return agents.ListingTypeApartment
+	case "plot":
+		return agents.ListingTypePlot
+	case "project":
+		return agents.ListingTypeProject
+	default:
+		return agents.ListingTypeUnknown
 	}
+}
 
-	n, err := html.Parse(strings.NewReader(p.body))
-	if err != nil {
+func (p *Crawler) GetForSale() (listings []agents.Listing, err error) {
+	if err := p.fetch(); err != nil {
 		return nil, err
 	}
-	nodes := css.QueryAll(n, css.MustCompile("body>div.wrapper>div.ol-wrapper.container>div.col"))
-	if len(nodes) == 0 {
-		return nil, xcss.NotFoundErr{Name: "body>div.wrapper>div.ol-wrapper.container>div.col"}
+
+	for _, notarListing := range p.listings {
+		b, _ := json.Marshal(notarListing)
+		println(string(b))
+		l := agents.Listing{
+			Name:     strings.ReplaceAll(fmt.Sprintf("%s (%s)", notarListing.Address, notarListing.ID), "\n", ""),
+			Link:     "https://www.notar.se/kopa-bostad/objekt/" + notarListing.ID,
+			Type:     getListingType(notarListing.Type),
+			Upcoming: false,
+			Facts: []string{
+				fmt.Sprintf("%d", notarListing.Price.StartingPrice),
+				fmt.Sprintf("%d rooms", notarListing.NumberOfRooms),
+				fmt.Sprintf("%d plot", notarListing.Plot.Area),
+			},
+			SquareMetres: notarListing.LivingSpaceArea,
+			Price:        notarListing.Price.StartingPrice,
+		}
+		if len(notarListing.Images) > 0 {
+			l.Image = fmt.Sprintf("https://notar-media.b-cdn.net/objects/%s/images/%s/JPG/840/%s", notarListing.AgentID, notarListing.CustomerID, notarListing.Images[0].File)
+		}
+		listings = append(listings, l)
 	}
-	var compressSpace = regexp.MustCompile(`\s+`)
-
-	for _, n = range nodes {
-
-		title := xcss.CollectText(css.Query(n, css.MustCompile("h3.oc-title")))
-
-		ignore := false
-		for _, term := range []string{"KALMAR", "OSKARSHAMN", "NYBRO", "TORSÅS", "MÖNSTERÅS", "BORGHOLM"} {
-			if strings.Contains(strings.ToUpper(title), term) {
-				ignore = true
-				break
-			}
-		}
-
-		if ignore {
-			log.Printf("ignoring %s", title)
-			continue
-		}
-
-		var listingType agents.ListingType
-		if xcss.HasClass(n, "house") {
-			listingType = agents.ListingTypeHouse
-		} else if xcss.HasClass(n, "project") {
-			listingType = agents.ListingTypeProject
-		} else if xcss.HasClass(n, "housingcooperative") {
-			continue
-		} else if xcss.HasClass(n, "plot") {
-			listingType = agents.ListingTypePlot
-		} else {
-			listingType = agents.ListingTypeUnknown
-		}
-
-		a := css.Query(n, css.MustCompile("a"))
-		img := css.Query(n, css.MustCompile("img"))
-		listing := agents.Listing{
-			Upcoming: xcss.CollectText(css.Query(n, css.MustCompile("div.oc-badge"))) == "I startblocken",
-			Link:     xcss.FindAttr(a, "href"),
-			Image:    xcss.FindAttr(img, "src"),
-			Type:     listingType,
-		}
-
-		sub := xcss.CollectText(css.Query(n, css.MustCompile("h4.oc-sub-title")))
-		listing.Name = strings.Join([]string{title, sub}, " ")
-
-		var facts []string
-		for _, f := range css.QueryAll(n, css.MustCompile("div.oc-fact")) {
-			raw := xcss.CollectText(f)
-			raw = strings.ReplaceAll(raw, "\n", "")
-			raw = strings.TrimSpace(raw)
-			raw = compressSpace.ReplaceAllString(raw, " ")
-			if strings.HasSuffix(raw, "kvm") {
-				sqmStr := strings.TrimSpace(strings.TrimSuffix(raw, "kvm"))
-				flVal, _ := strconv.ParseFloat(sqmStr, 32)
-				listing.SquareMetres = int(flVal)
-
-			}
-
-			facts = append(facts, raw)
-		}
-		listing.Facts = facts
-		ls = append(ls, listing)
-	}
-
 	return
 }
